@@ -1,0 +1,17 @@
+<template>
+    <lightning-card title="Checklist Items" icon-name="custom:custom63">
+        <template if:true={checkList}>
+            <lightning-datatable
+                key-field="Id"
+                data={checkList}
+                columns={columns}
+                draft-values={draftValues}
+                hide-checkbox-column="true"
+                onsave={handleSave}>
+            </lightning-datatable>
+        </template>
+        <template if:true={error}>
+            <p class="slds-text-color_error">Error fetching checklist items</p>
+        </template>
+    </lightning-card>
+</template>
