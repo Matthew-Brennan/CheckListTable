@@ -14,6 +14,10 @@ const columns = [
     { label: 'Delta', fieldName: 'Delta__c', editable: true }
 ];
 
+const actions = [
+    { label: 'New Task', name: 'new' },
+];
+
 export default class ChecklistDataTable extends LightningElement {
     @track checkList = [];
     columns = columns;
@@ -32,6 +36,31 @@ export default class ChecklistDataTable extends LightningElement {
             this.checkList = [];
         }
     }
+
+
+    handleNewTask() {
+        try{
+           const result = newTask(recordId);
+           console.log(JSON.stringify("Apex insert result: " + result));
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Checklist items updated',
+                    variant: 'success'
+                })
+            );
+        } catch(error) {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error inserting records',
+                    message: error.body.message,
+                    variant: 'error'
+                })
+            );
+        }
+    }
+
+
 
     async handleSave(event) {
         const updatedFields = event.detail.draftValues;
@@ -69,4 +98,10 @@ export default class ChecklistDataTable extends LightningElement {
             );
         }
     }
+
+
+        // requery to refresh the data
+        refreshData() {
+            return refreshApex(this.wiredCheckListResult);
+        }
 }
