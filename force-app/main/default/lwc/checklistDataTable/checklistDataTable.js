@@ -1,6 +1,7 @@
 import { LightningElement, wire, api, track } from 'lwc';
 import getCheckListItems from '@salesforce/apex/ChecklistController.getChecklistItems';
-import createNewTask from "@salesforce/apex/ChecklistController.updateTasks";
+import updateTasks from "@salesforce/apex/ChecklistController.updateTasks";
+import createNewTask from "@salesforce/apex/ChecklistController.newTask";
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
@@ -41,9 +42,10 @@ export default class ChecklistDataTable extends LightningElement {
     async handleNewTask() {
         try {
             const result = await createNewTask({ recordId: this.recordId });
+            
             console.log("Apex insert result: ", result);
             console.log("TYPE: " + typeof result)
-            if(typeof result == Object){
+            if(typeof result == 'object'){
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',

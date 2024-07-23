@@ -31,18 +31,22 @@ public with sharing class ChecklistController {
     //insert a new blank checklist item
     @AuraEnabled
     public static Checklist_Item__c newTask(String recordId) {
+
         Checklist_Item__c newTask = new Checklist_Item__c();
         newTask.Name = 'New Task';
-        newTask.Status__c = false; 
-        newTask.Checklist__r.Id = recordId; 
+        newTask.Status__c = false;
+        newTask.Budgeted_Time__c = 0.00;
+        newTask.Actual_Hours__c = 0.00;
+        newTask.Checklist__c = recordId; 
+        System.debug('@@@@ ' + newTask);        
+        insert newTask;
 
-        System.debug('@@@@ ' + newTask);
+        return newTask;
 
-        try {
-            insert newTask;
-            return newTask;
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        }
+       // try { 
+       //     return newTask;
+        // } catch (Exception e) {
+        //     throw new AuraHandledException(e.getMessage());
+        // }
     }
 }
