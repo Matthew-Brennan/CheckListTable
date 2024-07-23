@@ -1,6 +1,6 @@
 import { LightningElement, wire, api, track } from 'lwc';
 import getCheckListItems from '@salesforce/apex/ChecklistController.getChecklistItems';
-import updateTasks from "@salesforce/apex/ChecklistController.updateTasks";
+import createNewTask from "@salesforce/apex/ChecklistController.updateTasks";
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
@@ -38,22 +38,35 @@ export default class ChecklistDataTable extends LightningElement {
     }
 
 
-    handleNewTask() {
-        try{
-           const result = newTask(recordId);
-           console.log(JSON.stringify("Apex insert result: " + result));
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Success',
-                    message: 'Checklist items updated',
-                    variant: 'success'
-                })
-            );
+    async handleNewTask() {
+        try {
+            const result = await createNewTask({ recordId: this.recordId });
+            console.log("Apex insert result: ", result);
+            console.log("TYPE: " + typeof result)
+            if(typeof result == Object){
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: 'Checklist items updated',
+                        variant: 'success'
+                    })
+                );            
+                await refreshApex(this.wiredCheckListResult);
+            }else{
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error inserting task',
+                        message: result,
+                        variant: 'error'
+                    })
+                );
+            }
+            
         } catch(error) {
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error inserting records',
-                    message: error.body.message,
+                    message: error.body ? error.body.message : error.message,
                     variant: 'error'
                 })
             );

@@ -30,18 +30,19 @@ public with sharing class ChecklistController {
 
     //insert a new blank checklist item
     @AuraEnabled
-    public static string newTask(string recordId) {
+    public static Checklist_Item__c newTask(String recordId) {
         Checklist_Item__c newTask = new Checklist_Item__c();
         newTask.Name = 'New Task';
-        newTask.Status__c = false;
-        newTask.Checklist__r.Id = recordId;
+        newTask.Status__c = false; 
+        newTask.Checklist__r.Id = recordId; 
+
+        System.debug('@@@@ ' + newTask);
 
         try {
             insert newTask;
-            return 'Success: tasks updated successfully';
-        }
-        catch (Exception e) {
-            return 'The following exception has occurred: ' + e.getMessage();
+            return newTask;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
         }
     }
 }
