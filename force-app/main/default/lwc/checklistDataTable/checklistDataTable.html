@@ -11,26 +11,45 @@
             ></lightning-button-icon>
 
             <lightning-button-icon
-                    icon-name="utility:refresh"
-                    alternative-text="Refresh"
-                    title="Refresh"
-                    onclick={refreshData}
-                    class="slds-m-top_medium"
-                    style="padding-right: 14px;"
+                icon-name="utility:refresh"
+                alternative-text="Refresh"
+                title="Refresh"
+                onclick={refreshData}
+                class="slds-m-top_medium"
+                style="padding-right: 14px;"
                 ></lightning-button-icon>
+
+            <lightning-button 
+                variant="destructive" 
+                label="Delete" 
+                onclick={handleClickDelete}
+            ></lightning-button>
+
+            <lightning-button 
+                variant="Success" 
+                label="Data Loader" 
+                onclick={handleModalOpen}
+            ></lightning-button>
+
 
         <template if:true={checkList}>
             <lightning-datatable
-                key-field="Id"
+                key-field="id"
                 data={checkList}
                 columns={columns}
                 draft-values={draftValues}
-                hide-checkbox-column="true"
+                hide-checkbox-column={hideCheckboxColumn}
+                show-row-number-column={showRowNumberColumn}
+                onrowselection={handleRowSelection}
                 onsave={handleSave}>
             </lightning-datatable>
         </template>
         <template if:true={error}>
             <p class="slds-text-color_error">Error fetching checklist items</p>
+        </template>
+
+        <template if:true={isModalOpen}>
+            <c-check-List-data-loader onclose={handleModalClose} onsave={handleModalSave}></c-check-List-data-loader>
         </template>
     </lightning-card>
 </template>

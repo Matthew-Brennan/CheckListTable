@@ -12,6 +12,17 @@ public with sharing class ChecklistController {
         }
     }
 
+    @AuraEnabled
+    public static void deleteTasks(List<Id> taskIds){
+        try {
+            List<Checklist_Item__c> tasksToDelete = [SELECT Id FROM Checklist_Item__c WHERE Id IN :taskIds];
+            delete tasksToDelete;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+        
+    }
+
     //update the changed checklist items
     @AuraEnabled
     public static string updateTasks(Object data) {

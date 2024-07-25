@@ -2,6 +2,7 @@ import { LightningElement, wire, api, track } from 'lwc';
 import getCheckListItems from '@salesforce/apex/ChecklistController.getChecklistItems';
 import updateTasks from "@salesforce/apex/ChecklistController.updateTasks";
 import createNewTask from "@salesforce/apex/ChecklistController.newTask";
+import deleteTasks from "@salesforce/apex/ChecklistController.deleteTasks"; 
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
@@ -25,6 +26,12 @@ export default class ChecklistDataTable extends LightningElement {
     @api recordId;
     draftValues = [];
     error;
+
+    @track isModalOpen = false; // Track modal state
+
+    // Need to set these values here idk why
+    hideCheckboxColumn = false;
+    showRowNumberColumn = false;
     
     @wire(getCheckListItems, { recordId: '$recordId' })
     wiredCheckList(result) {
@@ -38,7 +45,7 @@ export default class ChecklistDataTable extends LightningElement {
         }
     }
 
-
+    //Function to handle inserting a new blank task
     async handleNewTask() {
         try {
             const result = await createNewTask({ recordId: this.recordId });
@@ -76,7 +83,7 @@ export default class ChecklistDataTable extends LightningElement {
     }
 
 
-
+    //function to handle saving changes
     async handleSave(event) {
         const updatedFields = event.detail.draftValues;
 
@@ -114,9 +121,64 @@ export default class ChecklistDataTable extends LightningElement {
         }
     }
 
+    handleRowSelection(event) {
+        const selectedRows = event.detail.selectedRows;
+        this.selectedRowsID = selectedRows.map(selectedRows => selectedRows.Id);
+
+    }
+
+    async handleClickDelete() {
+        console.log('Delete button clicked');
+        console.log('Selected rows:', this.selectedRowsID);
+        const result = confirm('Are you sure you want to delete the selected tasks?');
+        if (result) {
+            try {
+                await deleteTasks({ taskIds: this.selectedRowsID });
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: 'Tasks deleted successfully',
+                        variant: 'success'
+                    })
+                );
+                await refreshApex(this.wiredCheckListResult);
+
+                // Unselect rows after delete
+                this.template.querySelector('lightning-datatable').selectedRows = [];
+                this.selectedRowsID = [];
+            } catch (error) {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error deleting tasks',
+                        message: error.body.message,
+                        variant: 'error'
+                    })
+                );
+            }
+        }
+    }
 
         // requery to refresh the data
         refreshData() {
             return refreshApex(this.wiredCheckListResult);
+        }
+
+        handleModalOpen() {
+            console.log("MODAL")
+            this.isModalOpen = true;
+        }
+
+
+        //Close the modal
+        handleModalClose() {
+            this.isModalOpen = false;
+        }
+    
+        //save the info added by the modal probably wont use as the info should be added from the modal LWC itself
+        handleModalSave(event) {
+            // const taskName = event.detail.taskName;
+            // // Implement the logic to save the new task using Apex method
+            // this.handleNewTaskApex(taskName);
+            this.isModalOpen = false;
         }
 }
