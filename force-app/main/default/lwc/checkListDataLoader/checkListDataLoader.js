@@ -65,10 +65,12 @@ export default class CheckListDataLoader extends LightningElement {
     }
 
     saveFile() {
-
+        console.log(JSON.stringify(this.fileContents));
+        console.log("Object: "+this.fileContents);
         try {
             saveFile({ base64Data: JSON.stringify(this.fileContents), cdbId: this.recordid })
             .then(result => {
+                
                 if (result === null || result.length === 0) {
                 this.dispatchEvent(
                     new ShowToastEvent({

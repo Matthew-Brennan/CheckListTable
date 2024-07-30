@@ -1,7 +1,7 @@
 public class lwcCSVUploaderController {
 
     @AuraEnabled
-    public static List<Checklist_Item__c> saveFile(String base64Data){
+    public static List<Checklist_Item__c> saveFile(String base64Data, string cdbId){
     
         String data = JSON.deserializeUntyped(base64Data).toString();
         List<Checklist_Item__c> lstCCToInsert = new List<Checklist_Item__c>();
@@ -15,14 +15,15 @@ public class lwcCSVUploaderController {
         
             for(String column : csvLine.split(',')){
         
-                column = column.replaceAll(':quotes:', '"').replaceAll(':comma:', ',');    
+                column = column.replaceAll(':quotes:', '"').replaceAll(':commas:', ',');    
                 csvRowData.add(column);  
             }
-    
+
             cli.WBS__c = Decimal.valueOf(csvRowData[0]);
             cli.Name = csvRowData[1];
             cli.Budgeted_Time__c = Decimal.valueOf(csvRowData[3]);
             cli.Actual_Hours__c = Decimal.valueOf(csvRowData[4]);
+            cli.Checklist__c = cdbId;
             lstCCToInsert.add(cli);
         }
     
