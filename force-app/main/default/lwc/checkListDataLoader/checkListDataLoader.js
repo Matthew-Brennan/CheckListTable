@@ -66,53 +66,58 @@ export default class CheckListDataLoader extends LightningElement {
 
     handleCSV() {
         console.log(JSON.stringify(this.fileContents));
-        console.log("Object: "+this.fileContents);
+        console.log("Object: " + this.fileContents);
         console.log(this.recordId);
+    
         try {
-            saveFile({ base64Data: JSON.stringify(this.fileContents), cdbId: this.recordId })
-            .then(result => {
-                
-                if (result === null || result.length === 0) {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                    title: 'Warning',
-                    message: 'The CSV file does not contain any data',
-                    variant: 'warning',
-                }),);
-                }else{
-                    this.data = result;
-                    this.fileName = this.fileName + ' – Uploaded Successfully';
-                    this.isTrue = false;
+            // Base64 encode the file contents
+            const base64Data = btoa(this.fileContents);
+            saveFile({ base64Data: base64Data, cdbId: this.recordId })
+                .then(result => {
+                    if (result === null || result.length === 0) {
+                        this.dispatchEvent(
+                            new ShowToastEvent({
+                                title: 'Warning',
+                                message: 'The CSV file does not contain any data',
+                                variant: 'warning',
+                            }),
+                        );
+                    } else {
+                        this.data = result;
+                        this.fileName = this.fileName + ' – Uploaded Successfully';
+                        this.isTrue = false;
+                        this.showLoadingSpinner = false;
+                        this.dispatchEvent(
+                            new ShowToastEvent({
+                                title: 'Success!!',
+                                message: this.filesUploaded[0].name + ' – Uploaded Successfully!!!',
+                                variant: 'success',
+                            }),
+                        );
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
                     this.showLoadingSpinner = false;
                     this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success!!',
-                        message: this.filesUploaded[0].name + ' – Uploaded Successfully!!!',
-                        variant: 'success',
-                    }),);
-                }
-            })
-
-        .catch(error => {
+                        new ShowToastEvent({
+                            title: 'Error while uploading File',
+                            message: error.message,
+                            variant: 'error',
+                        }),
+                    );
+                });
+    
+        } catch (error) {
             console.error(error);
             this.showLoadingSpinner = false;
             this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Error while uploading File',
-                message: error.message,
-                variant: 'error',
-            }),);
-        });
-
-        }catch(error){
-            console.error(error);
-            this.showLoadingSpinner = false;
-            this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Error',
-                message: 'An unexpected error occurred.',
-                variant: 'error',
-            }),);
+                new ShowToastEvent({
+                    title: 'Error',
+                    message: 'An unexpected error occurred.',
+                    variant: 'error',
+                }),
+            );
         }
     }
 }

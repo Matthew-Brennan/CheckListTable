@@ -3,20 +3,27 @@ public class lwcCSVUploaderController {
     @AuraEnabled
     public static List<Checklist_Item__c> saveFile(String base64Data, String cdbId) {
         List<Checklist_Item__c> lstCCToInsert = new List<Checklist_Item__c>();
+        System.debug('Received cdbId: ' + cdbId);
+        System.debug('Received base64Data: ' + base64Data);
+
         try {
-            String data = JSON.deserializeUntyped(base64Data).toString();
-            List<String> lstCSVLines = data.split('\n');  
+            // Decode base64 data
+            Blob decodedBlob = EncodingUtil.base64Decode(base64Data);
+            String decodedData = decodedBlob.toString();
+            List<String> lstCSVLines = decodedData.split('\n');
+            System.debug('Decoded CSV Lines: ' + lstCSVLines);
 
             for (Integer i = 1; i < lstCSVLines.size(); i++) {
                 Checklist_Item__c cli = new Checklist_Item__c();
                 String csvLine = lstCSVLines[i];
                 List<String> csvRowData = parseCSVLine(csvLine);
+                System.debug('CSV Row Data: ' + csvRowData);
 
                 if (csvRowData.size() >= 5) {
-                   // cli.WBS__c = Decimal.valueOf(csvRowData[0]);
+                    cli.WBS__c = Decimal.valueOf(csvRowData[0]);
                     cli.Name = csvRowData[1];
-                 //   cli.Budgeted_Time__c = Decimal.valueOf(csvRowData[3]); 
-                  //  cli.Actual_Hours__c = Decimal.valueOf(csvRowData[4]); 
+                    cli.Budgeted_Time__c = Decimal.valueOf(csvRowData[3]);
+                    cli.Actual_Hours__c = Decimal.valueOf(csvRowData[4]);
                     cli.Checklist__c = cdbId;
                     lstCCToInsert.add(cli);
                 } else {
