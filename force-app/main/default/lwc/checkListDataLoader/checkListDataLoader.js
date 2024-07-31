@@ -9,7 +9,7 @@ const columns = [
 ];
 
 export default class CheckListDataLoader extends LightningElement {
-    @api recordid;
+    @api recordId;
 
     @track columns = columns;
     @track data;
@@ -57,18 +57,19 @@ export default class CheckListDataLoader extends LightningElement {
 
         this.fileReader.onloadend = () => {
             this.fileContents = this.fileReader.result;
-            this.saveFile();
+            this.handleCSV();
         };
 
         this.fileReader.readAsText(this.filesUploaded[0]);
 
     }
 
-    saveFile() {
+    handleCSV() {
         console.log(JSON.stringify(this.fileContents));
         console.log("Object: "+this.fileContents);
+        console.log(this.recordId);
         try {
-            saveFile({ base64Data: JSON.stringify(this.fileContents), cdbId: this.recordid })
+            saveFile({ base64Data: JSON.stringify(this.fileContents), cdbId: this.recordId })
             .then(result => {
                 
                 if (result === null || result.length === 0) {

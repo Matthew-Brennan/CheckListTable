@@ -1,7 +1,7 @@
 @isTest
 public class lwcCSVUploaderControllerTest{
 
-    Static String base64Data = '\"WBS,Name,Notes,Budgeted Time,Actual Hours\\r\\n1,task 1,,5.00,4.00,\\r\\n"';
+    Static String base64Data = '\"WBS,Name,Notes,Budgeted Time,Actual Hours\\r\\n1.0,task 1,,5.00,4.00,\\r\\n"';
 
     static testmethod void testfileupload(){
 
