@@ -24,6 +24,8 @@ export default class CheckListDataLoader extends LightningElement {
     fileContents;
     fileReader;
     content;
+    formattedCSV = [[]];
+    
     MAX_FILE_SIZE = 1500000;
 
     handleFilesChange(event) {
@@ -65,14 +67,28 @@ export default class CheckListDataLoader extends LightningElement {
     }
 
     handleCSV() {
-        console.log(JSON.stringify(this.fileContents));
-        console.log("Object: " + this.fileContents);
-        console.log(this.recordId);
+
+        let lines = [];
+        let lines2 = this.fileContents.split('\n');
+        lines2.forEach((line, index) => {
+        lines.push(line);
+        });
+
+        let parsedArray = lines.map(line => this.parseCSVLine(line));
+
+        parsedArray.shift(); // remove the title row
+        parsedArray.pop(); // remove the final row that is blank
+
+        console.log('Normal: ' + parsedArray);
+        
+        console.log('stringfy: ' + JSON.stringify(parsedArray));
+        
+        //console.log('Reversed: ' + JSON.parse(parsedArray));
     
         try {
             // Base64 encode the file contents
-            const base64Data = btoa(this.fileContents);
-            saveFile({ base64Data: base64Data, cdbId: this.recordId })
+            const jsonArray = JSON.stringify(parsedArray);
+            saveFile({ jsonArray: jsonArray, cdbId: this.recordId })
                 .then(result => {
                     if (result === null || result.length === 0) {
                         this.dispatchEvent(
@@ -119,5 +135,24 @@ export default class CheckListDataLoader extends LightningElement {
                 }),
             );
         }
+    }
+
+    // Function to parse CSV line considering quotes
+    parseCSVLine(line) {
+        let result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let char of line) {
+            if (char === '"') {
+                inQuotes = !inQuotes; // Toggle inQuotes flag
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim()); // Push the last value
+        return result;
     }
 }

@@ -1,66 +1,50 @@
 public class lwcCSVUploaderController {
 
     @AuraEnabled
-    public static List<Checklist_Item__c> saveFile(String base64Data, String cdbId) {
-        List<Checklist_Item__c> lstCCToInsert = new List<Checklist_Item__c>();
-        System.debug('Received cdbId: ' + cdbId);
-        System.debug('Received base64Data: ' + base64Data);
-
+    public static List<Checklist_Item__c> saveFile(String jsonArray, String cdbId) {
         try {
-            // Decode base64 data
-            Blob decodedBlob = EncodingUtil.base64Decode(base64Data);
-            String decodedData = decodedBlob.toString();
-            List<String> lstCSVLines = decodedData.split('\n');
-            System.debug('Decoded CSV Lines: ' + lstCSVLines);
+            // Deserialize the JSON array into a list of objects
+            List<Object> outerList = (List<Object>) JSON.deserializeUntyped(jsonArray);
 
-            for (Integer i = 1; i < lstCSVLines.size(); i++) {
-                Checklist_Item__c cli = new Checklist_Item__c();
-                String csvLine = lstCSVLines[i];
-                List<String> csvRowData = parseCSVLine(csvLine);
-                System.debug('CSV Row Data: ' + csvRowData);
+            System.debug(outerList);
+            System.debug(outerList[0]);
 
-                if (csvRowData.size() >= 5) {
-                    cli.WBS__c = Decimal.valueOf(csvRowData[0]);
-                    cli.Name = csvRowData[1];
-                    cli.Budgeted_Time__c = Decimal.valueOf(csvRowData[3]);
-                    cli.Actual_Hours__c = Decimal.valueOf(csvRowData[4]);
-                    cli.Checklist__c = cdbId;
-                    lstCCToInsert.add(cli);
-                } else {
-                    throw new AuraHandledException('CSV row does not have enough columns: ' + csvLine);
+
+
+            // Initialize the list to hold the Checklist_Item__c records
+            List<Checklist_Item__c> checklistItems = new List<Checklist_Item__c>();
+
+            // Iterate through each element in the outer list and cast it to a list of objects
+            for (Object obj : outerList) {
+                List<Object> lstObj = (List<Object>) obj;
+                System.debug(lstObj);
+                System.debug(lstObj[0]);
+                System.debug(lstObj[1]);
+
+                Checklist_Item__c lstCCToInsert = new Checklist_Item__c();
+                lstCCToInsert.WBS__c = Decimal.valueOf(String.valueOf(lstObj[0]));
+                lstCCToInsert.Name = String.valueOf(lstObj[1]);
+                lstCCToInsert.Budgeted_Time__c = Decimal.valueOf(String.valueOf(lstObj[2]));
+                lstCCToInsert.Actual_Hours__c = Decimal.valueOf(String.valueOf(lstObj[3]));
+                lstCCToInsert.Checklist__c = cdbId;
+
+                // Add the record to the list if it's not empty
+                if (lstCCToInsert.Name != null && lstCCToInsert.WBS__c != null) {
+                    checklistItems.add(lstCCToInsert);
                 }
             }
 
-            if (!lstCCToInsert.isEmpty()) {
-                insert lstCCToInsert;
+            // Perform the DML operation to insert the records
+            if (!checklistItems.isEmpty()) {
+                insert checklistItems;
             }
+
+            // Return the list of inserted records
+            return checklistItems;
+
         } catch (Exception e) {
             System.debug('Error processing CSV file: ' + e.getMessage());
             throw new AuraHandledException('Error processing CSV file: ' + e.getMessage());
         }
-
-        return lstCCToInsert;
-    }
-
-    private static List<String> parseCSVLine(String csvLine) {
-        List<String> csvRowData = new List<String>();
-        Boolean inQuotes = false;
-        String currentValue = '';
-
-        for (Integer i = 0; i < csvLine.length(); i++) {
-            String c = csvLine.mid(i, 1);
-
-            if (c == '"') {
-                inQuotes = !inQuotes;
-            } else if (c == ',' && !inQuotes) {
-                csvRowData.add(currentValue);
-                currentValue = '';
-            } else {
-                currentValue += c;
-            }
-        }
-        csvRowData.add(currentValue);
-
-        return csvRowData;
     }
 }

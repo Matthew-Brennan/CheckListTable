@@ -164,7 +164,6 @@ export default class ChecklistDataTable extends LightningElement {
         }
 
         handleModalOpen() {
-            console.log("MODAL")
             this.isModalOpen = true;
         }
 
