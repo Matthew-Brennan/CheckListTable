@@ -49,7 +49,7 @@
         </template>
 
         <template if:true={isModalOpen}>
-            <c-check-List-data-loader onclose={handleModalClose} onsave={handleModalSave}></c-check-List-data-loader>
+            <c-check-List-data-loader record-id={recordId} onclose={handleModalClose} onsave={handleModalSave}></c-check-List-data-loader>
         </template>
     </lightning-card>
 </template>

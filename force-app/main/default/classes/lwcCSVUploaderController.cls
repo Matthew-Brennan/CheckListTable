@@ -3,19 +3,25 @@ public class lwcCSVUploaderController {
     @AuraEnabled
     public static Checklist_Item__c insertNewElement(Decimal wbsNum, Decimal budgetedTime, Decimal actualTime, string taskName, String cdbId) {
 
-        Checklist_Item__c newTask = new Checklist_Item__c();
-        newTask.Name = taskName;
-        newTask.WBS__c = wbsNum;
-        newTask.Budgeted_Time__c = budgetedTime;
-        newTask.Actual_Hours__c = actualTime;
-        newTask.Checklist__c = cdbId; 
-     
-        insert newTask;
+        system.debug('wbs ' + wbsNum);
+        system.debug('taskName ' + taskName);
+        system.debug('cdbId ' + cdbId);
+        system.debug('budgetedTime ' + budgetedTime);
+        system.debug('actualTime ' + actualTime);
 
         try { 
-            return newTask;
+            Checklist_Item__c newTask = new Checklist_Item__c();
+            newTask.Name = taskName;
+            newTask.WBS__c = wbsNum;
+            newTask.Budgeted_Time__c = budgetedTime;
+            newTask.Actual_Hours__c = actualTime;
+            newTask.Checklist__c = cdbId; 
+        
+            insert newTask;
+
+            return newTask;           
         } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
+            throw new AuraHandledException(e.getMessage() +'WBS ' +wbsNum +' bugedted Time ' + budgetedTime + ' actual Time ' + actualTime + ' Task Name '+ taskName+ ' Id '   + cdbId );
         }
 
     }

@@ -100,7 +100,7 @@ public class lwcCSVUploaderControllerTest {
         // Prepare test data
         String cdbId = testItem.Id;
 
-        Decimal budgetedTime = 5.25;
+        Decimal budgetedTime = 5;
         Decimal actualTime = 2.3;
         Decimal wbs = 1.0;
         string  taskName = 'Task Name';
