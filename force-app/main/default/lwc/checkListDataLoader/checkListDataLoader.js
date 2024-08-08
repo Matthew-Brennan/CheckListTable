@@ -1,5 +1,6 @@
 import { LightningElement, api, track } from 'lwc';
 import saveFile from '@salesforce/apex/lwcCSVUploaderController.saveFile';
+import insertLine from '@salesforce/apex/lwcCSVUploaderController.insertNewElement';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const columns = [
@@ -79,62 +80,73 @@ export default class CheckListDataLoader extends LightningElement {
         parsedArray.shift(); // remove the title row
         parsedArray.pop(); // remove the final row that is blank
 
-        console.log('Normal: ' + parsedArray);
+        parsedArray.forEach(element => {
+            console.log('element: ' + parseFloat(element[0]) + " type: " + typeof(parseFloat(element[0])));
+            console.log('element: ' + element[1] + " type: " + typeof(element[1]));
+            console.log('element: ' + parseFloat(element[3]) + " type: " + typeof(parseFloat(element[3])));
+            console.log('element: ' + parseFloat(element[4]) + " type: " + typeof(parseFloat(element[4])));
+
+            insertLine({
+                wbsNum: parseFloat(element[0]),
+                budgetedTime: parseFloat(element[3]),
+                actualTime: parseFloat(element[4]),
+                taskName: element[1],
+                cbdId: this.recordId
+        });
+    })
         
-        console.log('stringfy: ' + JSON.stringify(parsedArray));
         
-        //console.log('Reversed: ' + JSON.parse(parsedArray));
     
-        try {
-            // Base64 encode the file contents
-            const jsonArray = JSON.stringify(parsedArray);
-            saveFile({ jsonArray: jsonArray, cdbId: this.recordId })
-                .then(result => {
-                    if (result === null || result.length === 0) {
-                        this.dispatchEvent(
-                            new ShowToastEvent({
-                                title: 'Warning',
-                                message: 'The CSV file does not contain any data',
-                                variant: 'warning',
-                            }),
-                        );
-                    } else {
-                        this.data = result;
-                        this.fileName = this.fileName + ' – Uploaded Successfully';
-                        this.isTrue = false;
-                        this.showLoadingSpinner = false;
-                        this.dispatchEvent(
-                            new ShowToastEvent({
-                                title: 'Success!!',
-                                message: this.filesUploaded[0].name + ' – Uploaded Successfully!!!',
-                                variant: 'success',
-                            }),
-                        );
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                    this.showLoadingSpinner = false;
-                    this.dispatchEvent(
-                        new ShowToastEvent({
-                            title: 'Error while uploading File',
-                            message: error.message,
-                            variant: 'error',
-                        }),
-                    );
-                });
+        // try {
+        //     // Base64 encode the file contents
+        //     const jsonArray = JSON.stringify(parsedArray);
+        //     saveFile({ jsonArray: jsonArray, cdbId: this.recordId })
+        //         .then(result => {
+        //             if (result === null || result.length === 0) {
+        //                 this.dispatchEvent(
+        //                     new ShowToastEvent({
+        //                         title: 'Warning',
+        //                         message: 'The CSV file does not contain any data',
+        //                         variant: 'warning',
+        //                     }),
+        //                 );
+        //             } else {
+        //                 this.data = result;
+        //                 this.fileName = this.fileName + ' – Uploaded Successfully';
+        //                 this.isTrue = false;
+        //                 this.showLoadingSpinner = false;
+        //                 this.dispatchEvent(
+        //                     new ShowToastEvent({
+        //                         title: 'Success!!',
+        //                         message: this.filesUploaded[0].name + ' – Uploaded Successfully!!!',
+        //                         variant: 'success',
+        //                     }),
+        //                 );
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error(error);
+        //             this.showLoadingSpinner = false;
+        //             this.dispatchEvent(
+        //                 new ShowToastEvent({
+        //                     title: 'Error while uploading File',
+        //                     message: error.message,
+        //                     variant: 'error',
+        //                 }),
+        //             );
+        //         });
     
-        } catch (error) {
-            console.error(error);
-            this.showLoadingSpinner = false;
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Error',
-                    message: 'An unexpected error occurred.',
-                    variant: 'error',
-                }),
-            );
-        }
+        // } catch (error) {
+        //     console.error(error);
+        //     this.showLoadingSpinner = false;
+        //     this.dispatchEvent(
+        //         new ShowToastEvent({
+        //             title: 'Error',
+        //             message: 'An unexpected error occurred.',
+        //             variant: 'error',
+        //         }),
+        //     );
+        // }
     }
 
     // Function to parse CSV line considering quotes

@@ -1,10 +1,33 @@
 @isTest
 public class lwcCSVUploaderControllerTest {
 
+    // @isTest
+    // static void testinsertNewElement() {
+
+    //     //Create a temporary checklist item
+    //     Checklist__c testItem = new Checklist__c();
+    //     testItem.Name = 'Test Item';
+    //     insert testItem;
+
+    //     // Prepare test data
+    //     String cdbId = testItem.Id;
+
+    //     List<Object> testLine = new List<Object> { '1.0', 'Task 1', '', '5.0', '2.0' };
+
+    //     Test.startTest();
+    //     insertNewElement(testLine, cdbId);
+    //     Test.stopTest();
+    // }
+
     @isTest
     static void testSaveFile() {
+        //Create a temporary checklist item
+        Checklist__c testItem = new Checklist__c();
+        testItem.Name = 'Test Item';
+        insert testItem;
+
         // Prepare test data
-        String cdbId = 'someCdbId';
+        String cdbId = testItem.Id;
         
         // Create a sample 2D array and convert it to a JSON string
         List<List<Object>> array2D = new List<List<Object>> {
@@ -65,4 +88,33 @@ public class lwcCSVUploaderControllerTest {
         // Verify that no records were created due to invalid data
         System.assertEquals(0, result.size(), 'No checklist items should be created with invalid data.');
     }
-}
+
+    @isTest
+    static void testinsertNewElement() {
+
+        //Create a temporary checklist item
+        Checklist__c testItem = new Checklist__c();
+        testItem.Name = 'Test Item';
+        insert testItem;
+
+        // Prepare test data
+        String cdbId = testItem.Id;
+
+        Decimal budgetedTime = 5.25;
+        Decimal actualTime = 2.3;
+        Decimal wbs = 1.0;
+        string  taskName = 'Task Name';
+
+        // Call the method with mock data
+        Test.startTest();
+        try {
+            Checklist_Item__c newTask = lwcCSVUploaderController.insertNewElement(wbs, budgetedTime, actualTime, taskName, cdbId);
+        } catch (Exception e) {
+            System.assert(e.getMessage().contains('Script-thrown exception'));
+        }
+        Test.stopTest();
+
+        // Verify that 1 record has been inserted
+        List<Checklist_Item__c> tasks = [SELECT Id FROM Checklist_Item__c WHERE Checklist__c = :cdbId];
+        System.assertEquals(1, tasks.size());
+    }}
