@@ -1,5 +1,6 @@
 import { LightningElement, api, track } from 'lwc';
 import saveFile from '@salesforce/apex/lwcCSVUploaderController.saveFile';
+import insertLine from '@salesforce/apex/lwcCSVUploaderController.insertNewElement';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const columns = [
@@ -24,6 +25,8 @@ export default class CheckListDataLoader extends LightningElement {
     fileContents;
     fileReader;
     content;
+    formattedCSV = [[]];
+    
     MAX_FILE_SIZE = 1500000;
 
     handleFilesChange(event) {
@@ -65,54 +68,93 @@ export default class CheckListDataLoader extends LightningElement {
     }
 
     handleCSV() {
-        console.log(JSON.stringify(this.fileContents));
-        console.log("Object: "+this.fileContents);
-        console.log(this.recordId);
-        try {
-            saveFile({ base64Data: JSON.stringify(this.fileContents), cdbId: this.recordId })
-            .then(result => {
-                
-                if (result === null || result.length === 0) {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                    title: 'Warning',
-                    message: 'The CSV file does not contain any data',
-                    variant: 'warning',
-                }),);
-                }else{
-                    this.data = result;
-                    this.fileName = this.fileName + ' – Uploaded Successfully';
-                    this.isTrue = false;
-                    this.showLoadingSpinner = false;
-                    this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success!!',
-                        message: this.filesUploaded[0].name + ' – Uploaded Successfully!!!',
-                        variant: 'success',
-                    }),);
-                }
-            })
 
-        .catch(error => {
-            console.error(error);
-            this.showLoadingSpinner = false;
-            this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Error while uploading File',
-                message: error.message,
-                variant: 'error',
-            }),);
+        let lines = [];
+        let lines2 = this.fileContents.split('\n');
+        lines2.forEach((line, index) => {
+        lines.push(line);
         });
 
-        }catch(error){
-            console.error(error);
-            this.showLoadingSpinner = false;
-            this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Error',
-                message: 'An unexpected error occurred.',
-                variant: 'error',
-            }),);
+        let parsedArray = lines.map(line => this.parseCSVLine(line));
+
+        parsedArray.shift(); // remove the title row
+        parsedArray.pop(); // remove the final row that is blank
+
+        try{
+            parsedArray.forEach(element => {   
+                console.log('RECORD ID: ' + this.recordId);
+                insertLine({
+                    wbsNum: parseFloat(element[0]),
+                    budgetedTime: parseFloat(element[3]),
+                    actualTime: parseFloat(element[4]),
+                    taskName: element[1],
+                    cdbId: this.recordId
+            })
+            .then(result => {
+                            if (result === null || result.length === 0) {
+                                this.dispatchEvent(
+                                    new ShowToastEvent({
+                                        title: 'Warning',
+                                        message: 'The CSV file does not contain any data',
+                                        variant: 'warning',
+                                    }),
+                                );
+                            } else {
+                                this.data = result;
+                                this.fileName = this.fileName + ' – Uploaded Successfully';
+                                this.isTrue = false;
+                                this.showLoadingSpinner = false;
+                                this.dispatchEvent(
+                                    new ShowToastEvent({
+                                        title: 'Success!!',
+                                        message: this.filesUploaded[0].name + ' – Uploaded Successfully!!!',
+                                        variant: 'success',
+                                    }),
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            this.showLoadingSpinner = false;
+                            this.dispatchEvent(
+                                new ShowToastEvent({
+                                    title: 'Error while uploading File',
+                                    message: error.message,
+                                    variant: 'error',
+                                }),
+                            );
+                        });
+        })
+
+        } catch (error) {
+                console.error(error);
+                this.showLoadingSpinner = false;
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error',
+                        message: 'An unexpected error occurred.',
+                        variant: 'error',
+                    }),
+                );
+            }
+        }     
+    
+    // Function to parse CSV line considering quotes
+    parseCSVLine(line) {
+        let result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let char of line) {
+            if (char === '"') {
+                inQuotes = !inQuotes; // Toggle inQuotes flag
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
         }
+        result.push(current.trim()); // Push the last value
+        return result;
     }
 }
