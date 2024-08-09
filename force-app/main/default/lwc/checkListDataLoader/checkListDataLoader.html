@@ -1,16 +1,14 @@
 <template>
-
-    <lightning-card title="Process CSV File">
+    <lightning-modal-header title="Process CSV File"></lightning-modal-header>
+    <lightning-modal-body>
+        <p>This is a test modal.</p>
         <div class="file-uploader">
             <lightning-input label="" name="file uploader" onchange={handleFilesChange} type="file" multiple></lightning-input>
-        <div class="error-message">{fileName}</div>
-            <lightning-button class="upload-button" label={UploadFile} onclick={handleSave} variant="brand" disabled={isTrue}></lightning-button>
+            <div class="error-message">{fileName}</div>
         </div>
-        </lightning-card>
-        <lightning-card title="Tasks" icon-name="standard:tasks">
-        <div class="datatable-container" if:true={data}>
-            <lightning-datatable data={data} columns={columns} key-field="id"></lightning-datatable>
-        </div>
-        <div><p>Record ID: {recordId}</p></div>
-    </lightning-card>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button label="Close" onclick={handleClose}></lightning-button>
+        <lightning-button class="upload-button" label="Upload File" onclick={handleSave} variant="brand"></lightning-button>
+    </lightning-modal-footer>
 </template>

@@ -6,6 +6,8 @@ import deleteTasks from "@salesforce/apex/ChecklistController.deleteTasks";
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
+import LightningModal from 'lightning/modal';
+import csvModal from 'c/checkListDataLoader'
 
 const columns = [
     { label: 'Task', fieldName: 'Name', editable: true },
@@ -162,22 +164,33 @@ export default class ChecklistDataTable extends LightningElement {
         refreshData() {
             return refreshApex(this.wiredCheckListResult);
         }
-
-        handleModalOpen() {
-            this.isModalOpen = true;
+        //open the modal
+        async handleModalOpen() {
+            try {
+                const result = await csvModal.open({
+                    label: 'Process CSV File',
+                    size: 'medium',
+                    description: 'Load your CSV file here',
+                    component: 'c-check-list-data-loader',
+                    recordId: this.recordId
+                });
+            if (result === 'saved') {
+                this.refreshData();
+            }
+        } catch {
+            console.log('Error opening modal:', error);
         }
-
-
+        }
+    
         //Close the modal
-        handleModalClose() {
+        async handleModalClose() {
+            this.refreshData();
             this.isModalOpen = false;
         }
     
         //save the info added by the modal probably wont use as the info should be added from the modal LWC itself
-        handleModalSave(event) {
-            // const taskName = event.detail.taskName;
-            // // Implement the logic to save the new task using Apex method
-            // this.handleNewTaskApex(taskName);
+        async handleModalSave() {
+
             this.isModalOpen = false;
         }
 }
