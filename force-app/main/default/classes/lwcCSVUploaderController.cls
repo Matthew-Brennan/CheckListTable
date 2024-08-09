@@ -1,13 +1,13 @@
 public class lwcCSVUploaderController {
 
     @AuraEnabled
-    public static Checklist_Item__c insertNewElement(Decimal wbsNum, Decimal budgetedTime, Decimal actualTime, string taskName, String cdbId) {
+    public static Checklist_Item__c insertNewElement(Decimal wbsNum, Decimal budgetedTime, Decimal actualTime, string taskName, string cdbId) {
 
-        system.debug('wbs ' + wbsNum);
-        system.debug('taskName ' + taskName);
-        system.debug('cdbId ' + cdbId);
-        system.debug('budgetedTime ' + budgetedTime);
-        system.debug('actualTime ' + actualTime);
+        System.debug('wbs ' + wbsNum);
+        System.debug('taskName ' + taskName);
+        System.debug('cdbId ' + cdbId);
+        System.debug('budgetedTime ' + budgetedTime);
+        System.debug('actualTime ' + actualTime);
 
         try { 
             Checklist_Item__c newTask = new Checklist_Item__c();

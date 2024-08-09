@@ -29,13 +29,6 @@ export default class CheckListDataLoader extends LightningElement {
     
     MAX_FILE_SIZE = 1500000;
 
-    connectedCallback() {
-        console.log('Record ID:', this.recordId);
-        if (!this.recordId) {
-            console.error('recordId is undefined');
-        }
-    }
-
     handleFilesChange(event) {
         if (event.target.files.length > 0) {
         this.filesUploaded = event.target.files;
@@ -87,16 +80,15 @@ export default class CheckListDataLoader extends LightningElement {
         parsedArray.shift(); // remove the title row
         parsedArray.pop(); // remove the final row that is blank
 
-        console.log('RECORD ID: ' + this.recordId);
-
         try{
             parsedArray.forEach(element => {   
+                console.log('RECORD ID: ' + this.recordId);
                 insertLine({
                     wbsNum: parseFloat(element[0]),
                     budgetedTime: parseFloat(element[3]),
                     actualTime: parseFloat(element[4]),
                     taskName: element[1],
-                    cbdId: this.recordId
+                    cdbId: this.recordId
             })
             .then(result => {
                             if (result === null || result.length === 0) {
@@ -147,58 +139,6 @@ export default class CheckListDataLoader extends LightningElement {
             }
         }     
     
-        // try {
-        //     // Base64 encode the file contents
-        //     const jsonArray = JSON.stringify(parsedArray);
-        //     saveFile({ jsonArray: jsonArray, cdbId: this.recordId })
-        //         .then(result => {
-        //             if (result === null || result.length === 0) {
-        //                 this.dispatchEvent(
-        //                     new ShowToastEvent({
-        //                         title: 'Warning',
-        //                         message: 'The CSV file does not contain any data',
-        //                         variant: 'warning',
-        //                     }),
-        //                 );
-        //             } else {
-        //                 this.data = result;
-        //                 this.fileName = this.fileName + ' – Uploaded Successfully';
-        //                 this.isTrue = false;
-        //                 this.showLoadingSpinner = false;
-        //                 this.dispatchEvent(
-        //                     new ShowToastEvent({
-        //                         title: 'Success!!',
-        //                         message: this.filesUploaded[0].name + ' – Uploaded Successfully!!!',
-        //                         variant: 'success',
-        //                     }),
-        //                 );
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error(error);
-        //             this.showLoadingSpinner = false;
-        //             this.dispatchEvent(
-        //                 new ShowToastEvent({
-        //                     title: 'Error while uploading File',
-        //                     message: error.message,
-        //                     variant: 'error',
-        //                 }),
-        //             );
-        //         });
-    
-        // } catch (error) {
-        //     console.error(error);
-        //     this.showLoadingSpinner = false;
-        //     this.dispatchEvent(
-        //         new ShowToastEvent({
-        //             title: 'Error',
-        //             message: 'An unexpected error occurred.',
-        //             variant: 'error',
-        //         }),
-        //     );
-        // }
-    // }
-
     // Function to parse CSV line considering quotes
     parseCSVLine(line) {
         let result = [];
