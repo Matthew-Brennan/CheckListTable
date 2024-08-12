@@ -1,37 +1,37 @@
 <template>
     <lightning-card title="Checklist Items" icon-name="custom:custom63">
+        <!-- Existing Buttons -->
+        <lightning-button-icon
+            icon-name="utility:add"
+            alternative-text="add"
+            title="New Task"
+            onclick={handleNewTask}
+            class="slds-m-top_medium"
+            style="padding-left: 14px;"
+        ></lightning-button-icon>
 
-            <lightning-button-icon
-                icon-name="utility:add"
-                alternative-text="add"
-                title="New Task"
-                onclick={handleNewTask}
-                class="slds-m-top_medium"
-                style="padding-left: 14px;"
-            ></lightning-button-icon>
+        <lightning-button-icon
+            icon-name="utility:refresh"
+            alternative-text="Refresh"
+            title="Refresh"
+            onclick={refreshData}
+            class="slds-m-top_medium"
+            style="padding-right: 14px;"
+        ></lightning-button-icon>
 
-            <lightning-button-icon
-                icon-name="utility:refresh"
-                alternative-text="Refresh"
-                title="Refresh"
-                onclick={refreshData}
-                class="slds-m-top_medium"
-                style="padding-right: 14px;"
-                ></lightning-button-icon>
+        <lightning-button 
+            variant="destructive" 
+            label="Delete" 
+            onclick={handleClickDelete}
+        ></lightning-button>
 
-            <lightning-button 
-                variant="destructive" 
-                label="Delete" 
-                onclick={handleClickDelete}
-            ></lightning-button>
+        <lightning-button 
+            variant="Success" 
+            label="Data Loader" 
+            onclick={handleModalOpen}
+        ></lightning-button>
 
-            <lightning-button 
-                variant="Success" 
-                label="Data Loader" 
-                onclick={handleModalOpen}
-            ></lightning-button>
-
-
+        <!-- Data Table -->
         <template if:true={checkList}>
             <lightning-datatable
                 key-field="id"
@@ -48,8 +48,13 @@
             <p class="slds-text-color_error">Error fetching checklist items</p>
         </template>
 
+        <!-- Modal Logic -->
         <template if:true={isModalOpen}>
-            <c-check-List-data-loader record-id={recordId} onclose={handleModalClose} onsave={handleModalSave}></c-check-List-data-loader>
+            <c-check-list-data-loader 
+                record-id={recordId} 
+                onclose={handleModalClose} 
+                onsave={handleModalSave}>
+            </c-check-list-data-loader>
         </template>
     </lightning-card>
 </template>
