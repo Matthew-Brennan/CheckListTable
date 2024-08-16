@@ -6,7 +6,8 @@ public with sharing class ChecklistController {
         try {
             return [SELECT Id, Name, Status__c, Budgeted_Time__c, Actual_Hours__c, WBS__c, Delta__c
                     FROM Checklist_Item__c
-                    WHERE Checklist__r.Id = :recordId];
+                    WHERE Checklist__r.Id = :recordId
+                    ORDER BY WBS__c ASC];
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }

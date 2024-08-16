@@ -106,7 +106,7 @@ handleCSV() {
                     );
                 } else {
                     this.data = result;
-                    this.fileName = this.fileName + ' – Uploaded Successfully';
+                    this.fileName = ' – Uploaded Successfully';
                     this.isTrue = false;
                     this.showLoadingSpinner = false;
                 }
@@ -114,13 +114,13 @@ handleCSV() {
             .catch(error => {
                 console.error(error);
                 this.showLoadingSpinner = false;
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error while uploading File',
-                        message: error.message,
-                        variant: 'error',
-                    })
-                );
+                // this.dispatchEvent(
+                //     new ShowToastEvent({
+                //         title: 'Error while uploading File',
+                //         message: error.message,
+                //         variant: 'error',
+                //     })
+                // );
             });
         });
     } catch (error) {
@@ -136,7 +136,6 @@ handleCSV() {
     }
 }
 
-// Add missing pieces to complete the code
 parseCSVLine(line) {
     let result = [];
     let current = '';

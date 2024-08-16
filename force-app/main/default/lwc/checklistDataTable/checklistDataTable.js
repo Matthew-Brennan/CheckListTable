@@ -10,8 +10,8 @@ import LightningModal from 'lightning/modal';
 import csvModal from 'c/checkListDataLoader'
 
 const columns = [
-    { label: 'Task', fieldName: 'Name', editable: true },
-    { label: 'WBS', fieldName: 'WBS__c', editable: true },
+    { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
+    { label: 'WBS', fieldName: 'WBS__c', editable: true, sortable: true },
     { label: 'Status', fieldName: 'Status__c', editable: true },
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
     { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
@@ -192,5 +192,29 @@ export default class ChecklistDataTable extends LightningElement {
         async handleModalSave() {
 
             this.isModalOpen = false;
+        }
+
+        handleSorting(event) {
+            this.sortBy = event.detail.fieldName;
+            this.sortDirection = event.detail.sortDirection;
+            this.sortData(this.sortBy, this.sortDirection);
+        }
+    
+        sortData(fieldname, direction) {
+            let parseData = JSON.parse(JSON.stringify(this.checkList));
+            // Return the value stored in the field
+            let keyValue = (a) => {
+                return a[fieldname];
+            };
+            // cheking reverse direction
+            let isReverse = direction === 'asc' ? 1: -1;
+            // sorting data
+            parseData.sort((x, y) => {
+                x = keyValue(x) ? keyValue(x) : ''; // handling null values
+                y = keyValue(y) ? keyValue(y) : '';
+                // sorting values based on direction
+                return isReverse * ((x > y) - (y > x));
+            });
+            this.checkList = parseData;
         }
 }
