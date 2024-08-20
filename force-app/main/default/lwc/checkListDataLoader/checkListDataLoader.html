@@ -1,14 +1,37 @@
 <template>
+    <!-- Modal header with a title -->
     <lightning-modal-header title="Process CSV File"></lightning-modal-header>
+
+    <!-- Modal body section -->
     <lightning-modal-body>
-        <p>This is a test modal.</p>
+        <!-- Container for the file uploader -->
         <div class="file-uploader">
-            <lightning-input label="" name="file uploader" onchange={handleFilesChange} type="file" multiple></lightning-input>
+            <!-- File input for selecting CSV files; onchange event triggers handleFilesChange -->
+            <lightning-input 
+                label=""                             
+                name="file uploader"                  
+                onchange={handleFilesChange}          
+                type="file"                          
+                multiple                              
+            ></lightning-input>
+            <!-- Display the name of the selected file or any error message -->
             <div class="error-message">{fileName}</div>
         </div>
     </lightning-modal-body>
+
+    <!-- Modal footer section with action buttons -->
     <lightning-modal-footer>
-        <lightning-button label="Close" onclick={handleClose}></lightning-button>
-        <lightning-button class="upload-button" label="Upload File" onclick={handleSave} variant="brand"></lightning-button>
+        <!-- Button to close the modal; onclick event triggers handleClose -->
+        <lightning-button 
+            label="Close"                        
+            onclick={handleClose}                      
+        ></lightning-button>
+        <!-- Button to upload the selected file; onclick event triggers handleSave -->
+        <lightning-button 
+            class="upload-button"                      
+            label="Upload File"            
+            onclick={handleSave}                      
+            variant="brand"                     
+        ></lightning-button>
     </lightning-modal-footer>
 </template>
