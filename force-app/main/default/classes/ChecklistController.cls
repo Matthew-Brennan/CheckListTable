@@ -33,6 +33,28 @@ public with sharing class ChecklistController {
         }
     }
 
+    @AuraEnabled(cacheable=true)  // Enables this method to be called from Aura or LWC and caches the results
+    public static String getTypeOfObject(String recordId) {
+        try {
+            //if its not a case object, as cases always start with 500
+            if (!recordId.startsWith('500')){
+                return recordId;
+            }else{
+                // Query all checklist items and order them by WBS__c field
+                Case chklst = [SELECT Id, Checklist__r.Id
+                    FROM Case
+                    WHERE Id = :recordId];
+
+                return chklst.Checklist__r.Id;
+            }
+        } catch (Exception e) {
+            // Handle any exceptions and throw a user-friendly error message
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+
+
     // Deletes a list of checklist items by their IDs
     //List <Id> taskIds: a list of the checked off tasks to be deleted
     @AuraEnabled  // Enables this method to be called from Aura or LWC
@@ -57,10 +79,7 @@ public with sharing class ChecklistController {
             JSON.serialize(data),
             List<Checklist_Item__c>.class
         );
-        // Ensure data contains valid record IDs
-        for (Checklist_Item__c task : data) {
-            System.debug('Task ID: ' + task.Id);
-        }
+
         try {
             // Update the checklist items with the deserialized data
             update tasksForUpdate;

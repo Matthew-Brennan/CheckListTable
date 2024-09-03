@@ -54,7 +54,8 @@
         <!-- Modal Logic -->
         <template if:true={isModalOpen}>
             <c-check-list-data-loader 
-                record-id={recordId} 
+                record-id={passedChklistId}
+                chklst={passedChklistId}
                 onclose={handleModalClose} 
                 onsave={handleModalSave}>
             </c-check-list-data-loader>

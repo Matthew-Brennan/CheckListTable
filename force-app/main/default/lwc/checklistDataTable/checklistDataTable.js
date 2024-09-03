@@ -2,7 +2,8 @@ import { LightningElement, wire, api, track } from 'lwc';
 import getCheckListItems from '@salesforce/apex/ChecklistController.getChecklistItems';
 import updateTasks from "@salesforce/apex/ChecklistController.updateTasks";
 import createNewTask from "@salesforce/apex/ChecklistController.newTask";
-import deleteTasks from "@salesforce/apex/ChecklistController.deleteTasks"; 
+import deleteTasks from "@salesforce/apex/ChecklistController.deleteTasks";
+import getTypeOfObj from "@salesforce/apex/ChecklistController.getTypeOfObject";
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
@@ -26,6 +27,7 @@ export default class ChecklistDataTable extends LightningElement {
     @track checkList = [];
     columns = columns;
     @api recordId;
+    passedChklistId;
     draftValues = [];
     error;
 
@@ -173,7 +175,7 @@ export default class ChecklistDataTable extends LightningElement {
                     size: 'medium',
                     description: 'Load your CSV file here',
                     component: 'c-check-list-data-loader',
-                    recordId: this.recordId
+                    recordId: this.passedChklistId,
                 });
             if (result === 'saved') {
                 this.refreshData();
@@ -218,4 +220,9 @@ export default class ChecklistDataTable extends LightningElement {
             });
             this.checkList = parseData;
         }
+
+        //set the id thats used for uploading modal features to the id of the Checklist even if the component is not on the checklist
+         async renderedCallback() {
+             this.passedChklistId = await getTypeOfObj({recordId: this.recordId});
+     }
 }

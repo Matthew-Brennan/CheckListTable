@@ -12,7 +12,7 @@ const columns = [
 
 export default class CheckListDataLoader extends LightningModal {
     @api recordId; // Expose recordId to the component to receive data from the parent component
-
+    @api chklst;
     @track columns = columns; // Track columns for rendering the data table
     @track data; // Track data to be displayed in the data table
     @track fileName = ''; // Track the name of the uploaded file
