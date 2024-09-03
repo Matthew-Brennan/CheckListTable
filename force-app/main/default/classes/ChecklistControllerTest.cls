@@ -43,6 +43,32 @@ private class ChecklistControllerTest {
         ChecklistController.deleteTasks(items);
         Test.stopTest();  // End the test context
         
-        // You can add assertions here to verify that the item was deleted as expected
+    }
+
+    @isTest
+    static void testupdateTaks(){
+        // Create and insert a test Checklist record
+        Checklist__c testList = new Checklist__c();
+        testList.Name = 'Test List';
+        insert testList;
+
+        // Create and insert a test Checklist_Item record associated with the test Checklist
+        Checklist_Item__c item = new Checklist_Item__c();
+        item.Name = 'Test Item';
+        item.Status__c = false;
+        item.Checklist__c = testList.Id;
+        insert item;
+
+        Checklist_Item__c item2 = new Checklist_Item__c();
+        item2.Name = 'CHANGED';
+        item2.Status__c = false;
+        item2.Checklist__c = testList.Id;
+        insert item2;
+
+        string = json.serialize(item2);
+        
+    
+        ChecklistController.updateTasks(data);
+
     }
 }

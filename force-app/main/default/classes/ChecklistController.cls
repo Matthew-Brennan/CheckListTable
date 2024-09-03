@@ -57,6 +57,10 @@ public with sharing class ChecklistController {
             JSON.serialize(data),
             List<Checklist_Item__c>.class
         );
+        // Ensure data contains valid record IDs
+        for (Checklist_Item__c task : data) {
+            System.debug('Task ID: ' + task.Id);
+        }
         try {
             // Update the checklist items with the deserialized data
             update tasksForUpdate;
