@@ -33,10 +33,11 @@ export default class ChecklistDataTable extends LightningElement {
 
     // Need to set these values here idk why
     hideCheckboxColumn = false;
-    showRowNumberColumn = false;
+    showRowNumberColumn = false;  
     
     @wire(getCheckListItems, { recordId: '$recordId' })
     wiredCheckList(result) {
+        //console.log(this.recordId.substring(0,3));
         this.wiredCheckListResult = result;
         if (result.data) {
             this.checkList = result.data;
