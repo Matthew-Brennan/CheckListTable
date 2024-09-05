@@ -224,5 +224,6 @@ export default class ChecklistDataTable extends LightningElement {
         //set the id thats used for uploading modal features to the id of the Checklist even if the component is not on the checklist
          async renderedCallback() {
              this.passedChklistId = await getTypeOfObj({recordId: this.recordId});
+
      }
 }

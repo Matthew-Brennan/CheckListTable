@@ -94,6 +94,8 @@ public with sharing class ChecklistController {
     // String recordID: the ID of the record page
     @AuraEnabled  // Enables this method to be called from Aura or LWC
     public static Checklist_Item__c newTask(String recordId) {
+
+        recordId = getTypeOfObject(recordId);
         // Create a new checklist item with default values
         Checklist_Item__c newTask = new Checklist_Item__c();
         newTask.Name = 'New Task';
