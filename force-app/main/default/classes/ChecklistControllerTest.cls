@@ -65,10 +65,40 @@ private class ChecklistControllerTest {
         item2.Checklist__c = testList.Id;
         insert item2;
 
-        string = json.serialize(item2);
+        string data = json.serialize(item2);
         
     
         ChecklistController.updateTasks(data);
+
+    }
+
+    @isTest
+    static void testgetTypeOfObject() {
+
+        // Create and insert a test Checklist record
+        Checklist__c testList = new Checklist__c();
+        testList.Name = 'Test List';
+        insert testList;
+
+        // Create and insert a test Checklist_Item record associated with the test Checklist
+        Checklist_Item__c item = new Checklist_Item__c();
+        item.Name = 'Test Item';
+        item.Status__c = false;
+        item.Checklist__c = testList.Id;
+        insert item;
+
+        // Create and insert a test Case record
+        Case testCase = new Case();
+        testCase.Checklist__c = testList.Id;
+        insert testCase;
+
+
+        // Start the test context to measure the execution of the code
+        Test.startTest();
+        // Call the deleteTasks method from ChecklistController with the list of item IDs
+        string resultCase = ChecklistController.getTypeOfObject(testCase.Id);
+        string resultNotCase = ChecklistController.getTypeOfObject(testList.Id);
+        Test.stopTest();  // End the test context
 
     }
 }

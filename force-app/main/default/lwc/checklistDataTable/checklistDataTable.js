@@ -171,7 +171,7 @@ export default class ChecklistDataTable extends LightningElement {
         }
         //open the modal
         async handleModalOpen() {
-            console.log('CSV LOADER')
+            console.log(this.passedChklistId);
             try {
                 const result = await csvModal.open({
                     label: 'Process CSV File',
@@ -189,14 +189,15 @@ export default class ChecklistDataTable extends LightningElement {
         }
 
         async handleTimeOpen() {
-            console.log('TIME ENTRIES');
+            console.log(this.passedChklistId);
             try {
                 const result = await timeEntryModal.open({
                     label: 'Time Entry',
                     size: 'large',
                     description: 'Time Entry',
                     component: 'c-check-list-time-entry',
-                    passedId: this.passedChklistId,
+                    checklistId: this.passedChklistId,
+                    caseId: this.recordId,
                 });
             if (result === 'saved') {
                 this.refreshData();
@@ -239,7 +240,7 @@ export default class ChecklistDataTable extends LightningElement {
             let keyValue = (a) => {
                 return a[fieldname];
             };
-            // cheking reverse direction
+            // checking reverse direction
             let isReverse = direction === 'asc' ? 1: -1;
             // sorting data
             parseData.sort((x, y) => {
@@ -254,6 +255,7 @@ export default class ChecklistDataTable extends LightningElement {
         //set the id thats used for uploading modal features to the id of the Checklist even if the component is not on the checklist
          async renderedCallback() {
              this.passedChklistId = await getTypeOfObj({recordId: this.recordId});
-
+             console.log('Case: ' + this.recordId);
+             console.log('checklist: ' + this.passedChklistId);
      }
 }

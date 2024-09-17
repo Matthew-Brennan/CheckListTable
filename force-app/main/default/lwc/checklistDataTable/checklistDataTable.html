@@ -69,8 +69,9 @@
 
         <!-- Modal Logic for to Time Entry -->
         <template if:true={toTimeEntry}>
-            <c-check-list-time-entry>
-                passed-id={passedChklistId}
+            <c-check-list-time-entry
+                case-id={recordId}
+                checklist-id={passedChklistId}
                 onclose={handleTimeClose} 
                 onsave={handleTimeSave}>
             </c-check-list-time-entry>
