@@ -9,6 +9,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
 import LightningModal from 'lightning/modal';
 import csvModal from 'c/checkListDataLoader'
+import timeEntryModal from 'c/checkListTimeEntry'
 
 const columns = [
     { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
@@ -32,6 +33,7 @@ export default class ChecklistDataTable extends LightningElement {
     error;
 
     @track isModalOpen = false; // Track modal state
+    @track toTimeEntry = false; // track time entry modal state
 
     // Need to set these values here idk why
     hideCheckboxColumn = false;
@@ -169,6 +171,7 @@ export default class ChecklistDataTable extends LightningElement {
         }
         //open the modal
         async handleModalOpen() {
+            console.log('CSV LOADER')
             try {
                 const result = await csvModal.open({
                     label: 'Process CSV File',
@@ -184,17 +187,44 @@ export default class ChecklistDataTable extends LightningElement {
             console.log('Error opening modal:', error);
         }
         }
+
+        async handleTimeOpen() {
+            console.log('TIME ENTRIES');
+            try {
+                const result = await timeEntryModal.open({
+                    label: 'Time Entry',
+                    size: 'large',
+                    description: 'Time Entry',
+                    component: 'c-check-list-time-entry',
+                    passedId: this.passedChklistId,
+                });
+            if (result === 'saved') {
+                this.refreshData();
+            }
+            } catch {
+                console.log('Error opening modal:', error);
+            }
+        }
     
         //Close the modal
         async handleModalClose() {
             this.refreshData();
             this.isModalOpen = false;
         }
+        async handleTimeClose() {
+            this.refreshData();
+            this.toTimeEntry = false;
+        }
     
         //save the info added by the modal probably wont use as the info should be added from the modal LWC itself
         async handleModalSave() {
 
             this.isModalOpen = false;
+        }
+
+        async handleTimeSave() {
+
+            this.toTimeEntry = false;
         }
 
         handleSorting(event) {

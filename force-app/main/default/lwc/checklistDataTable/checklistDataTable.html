@@ -31,6 +31,12 @@
             onclick={handleModalOpen}
         ></lightning-button>
 
+        <lightning-button 
+            variant="Success" 
+            label="Time Entries" 
+            onclick={handleTimeOpen}
+        ></lightning-button>
+
         <!-- Data Table -->
         <template if:true={checkList}>
             <lightning-datatable
@@ -51,7 +57,7 @@
             <p class="slds-text-color_error">Error fetching checklist items</p>
         </template>
 
-        <!-- Modal Logic -->
+        <!-- Modal Logic for Data Loader -->
         <template if:true={isModalOpen}>
             <c-check-list-data-loader 
                 record-id={passedChklistId}
@@ -59,6 +65,15 @@
                 onclose={handleModalClose} 
                 onsave={handleModalSave}>
             </c-check-list-data-loader>
+        </template>
+
+        <!-- Modal Logic for to Time Entry -->
+        <template if:true={toTimeEntry}>
+            <c-check-list-time-entry>
+                passed-id={passedChklistId}
+                onclose={handleTimeClose} 
+                onsave={handleTimeSave}>
+            </c-check-list-time-entry>
         </template>
     </lightning-card>
 </template>
