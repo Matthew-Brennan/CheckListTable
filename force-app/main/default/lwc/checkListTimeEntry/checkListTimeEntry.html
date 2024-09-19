@@ -4,19 +4,39 @@
 
     <!-- Modal body section -->
     <lightning-modal-body>
-        <!-- Container for the file uploader -->
-        <div class="file-uploader">
-            <!-- File input for selecting CSV files; onchange event triggers handleFilesChange -->
-            <lightning-input 
-                label=""                             
-                name="file uploader"                  
-                onchange={handleFilesChange}          
-                type="file"                          
-                multiple                              
+        
+            <!-- Case Related List Selector -->
+            <lightning-input
+                label="Case"
+                name="Case"
             ></lightning-input>
-            <!-- Display the name of the selected file or any error message -->
-            <div class="error-message">{fileName}</div>
-        </div>
+
+            <!-- User Related List Selector -->
+            <lightning-input
+                label="User"
+                name="User"
+            ></lightning-input>
+            <lightning-record-edit-form object-api-name={timeReportAPI}>
+                <lightning-messages> </lightning-messages>
+            <!-- Time Reporting Input Fields -->
+                <lightning-input-field field-name="Date"> </lightning-input-field>
+                <lightning-input-field field-name="Description of Work"> </lightning-input-field>
+                <lightning-input-field field-name="WBS"> </lightning-input-field>
+                <lightning-input-field field-name="Hours Worked"> </lightning-input-field>
+                <lightning-input-field field-name="OT Hours Worked"> </lightning-input-field>
+                <lightning-input-field field-name="Charge Out Position"> </lightning-input-field>
+                <lightning-input-field field-name="Charge Out Rate"> </lightning-input-field>
+                <lightning-input-field field-name="Billing Company"> </lightning-input-field>
+
+                <!--WHERE THE SIGNATURE WILL GO MAYBE-->
+                <lightning-button
+                class="slds-m-top_small"
+                type="submit"
+                label="Create new"
+            >
+            </lightning-button>
+        
+    </lightning-record-edit-form>
     </lightning-modal-body>
 
     <!-- Modal footer section with action buttons -->

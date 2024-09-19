@@ -198,7 +198,6 @@ export default class ChecklistDataTable extends LightningElement {
                     checklistId: this.passedChklistId,
                     caseId: this.recordId,
                 });
-                console.log('I TRIED');
                 if (result === 'saved') {
                     this.refreshData();
                 }
@@ -255,7 +254,5 @@ export default class ChecklistDataTable extends LightningElement {
         //set the id thats used for uploading modal features to the id of the Checklist even if the component is not on the checklist
          async renderedCallback() {
              this.passedChklistId = await getTypeOfObj({recordId: this.recordId});
-             console.log('Case: ' + this.recordId);
-             console.log('checklist: ' + this.passedChklistId);
      }
 }
