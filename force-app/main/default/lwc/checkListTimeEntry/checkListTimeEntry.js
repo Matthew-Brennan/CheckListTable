@@ -7,7 +7,6 @@ export default class CheckListTimeEntry extends LightningModal {
 
     @api caseId;      // Expose case record ID to the component to receive data from the parent component
     @api checklistId  // Expose checklist record ID to the component to receive data from the parent component
-    error;
 
 
     @wire(getCLI, {checklistId: this.checklistId})
@@ -17,8 +16,6 @@ export default class CheckListTimeEntry extends LightningModal {
             console.log(result.data);
             console.log(result.data[0]);
         }
-
-
     }
 
     // Invoked when the user clicks the save button; starts the file upload process

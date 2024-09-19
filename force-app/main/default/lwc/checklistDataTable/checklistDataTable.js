@@ -169,9 +169,8 @@ export default class ChecklistDataTable extends LightningElement {
         refreshData() {
             return refreshApex(this.wiredCheckListResult);
         }
-        //open the modal
+        //open the dataloader modal
         async handleModalOpen() {
-            console.log(this.passedChklistId);
             try {
                 const result = await csvModal.open({
                     label: 'Process CSV File',
@@ -188,8 +187,8 @@ export default class ChecklistDataTable extends LightningElement {
         }
         }
 
+        //open the Time Entry Modal
         async handleTimeOpen() {
-            console.log(this.passedChklistId);
             try {
                 const result = await timeEntryModal.open({
                     label: 'Time Entry',
@@ -199,11 +198,12 @@ export default class ChecklistDataTable extends LightningElement {
                     checklistId: this.passedChklistId,
                     caseId: this.recordId,
                 });
-            if (result === 'saved') {
-                this.refreshData();
-            }
+                console.log('I TRIED');
+                if (result === 'saved') {
+                    this.refreshData();
+                }
             } catch {
-                console.log('Error opening modal:', error);
+                console.log('Error opening modal:'+ result.error);
             }
         }
     

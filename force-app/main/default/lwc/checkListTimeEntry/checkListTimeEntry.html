@@ -4,7 +4,19 @@
 
     <!-- Modal body section -->
     <lightning-modal-body>
-
+        <!-- Container for the file uploader -->
+        <div class="file-uploader">
+            <!-- File input for selecting CSV files; onchange event triggers handleFilesChange -->
+            <lightning-input 
+                label=""                             
+                name="file uploader"                  
+                onchange={handleFilesChange}          
+                type="file"                          
+                multiple                              
+            ></lightning-input>
+            <!-- Display the name of the selected file or any error message -->
+            <div class="error-message">{fileName}</div>
+        </div>
     </lightning-modal-body>
 
     <!-- Modal footer section with action buttons -->
