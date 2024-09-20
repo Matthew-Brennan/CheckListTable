@@ -3,26 +3,34 @@ import insertLine from '@salesforce/apex/lwcCSVUploaderController.insertNewEleme
 import { ShowToastEvent } from 'lightning/platformShowToastEvent'; // Importing Toast event to show notifications
 import LightningModal from 'lightning/modal'; // Importing Lightning Modal for creating modal dialogs
 import getCLI from '@salesforce/apex/checklistTimeEntryController.checklistTimeEntryController'
-import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
+//import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
 export default class CheckListTimeEntry extends LightningModal {
 
     @api caseId;      // Expose case record ID to the component to receive data from the parent component
     @api checklistId  // Expose checklist record ID to the component to receive data from the parent component
 
     //Time Reporting Object Fields
-    timeReportAPI = TIME_REPORT;
+    timeReportAPI = 'SFDC_Time_Reporting__c';
+
+    renderedCallBack(){
+        console.log('Time Report Api: ' + this.timeReportAPI);
+    }
+
+    //Todo: get selected checklist items. for each selected open a new modal with its details
 
     @wire(getCLI, {checklistId: '$checklistId'})
     getCLI(result){ 
         try{
             if(result){
                 console.log(result);
+                
             }
         }catch (error){
-            console.log("ERROR: "+ error)
+            console.log("ERROR: "+ error);
         }
 
     }
+
 
     // Invoked when the user clicks the save button; starts the file upload process
     handleSave() {
