@@ -6,14 +6,17 @@ import getCLI from '@salesforce/apex/checklistTimeEntryController.checklistTimeE
 //import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
 export default class CheckListTimeEntry extends LightningModal {
 
-    @api caseId;      // Expose case record ID to the component to receive data from the parent component
-    @api checklistId  // Expose checklist record ID to the component to receive data from the parent component
+    @api caseId;       // Expose case record ID to the component to receive data from the parent component
+    @api checklistId   // Expose checklist record ID to the component to receive data from the parent component
+    @api selectedRowID //
+    @api timeEntry
 
     //Time Reporting Object Fields
     timeReportAPI = 'SFDC_Time_Reporting__c';
 
     renderedCallBack(){
         console.log('Time Report Api: ' + this.timeReportAPI);
+        console.log('Selected Row: ' + this.selectedRowID);
     }
 
     //Todo: get selected checklist items. for each selected open a new modal with its details
@@ -22,13 +25,23 @@ export default class CheckListTimeEntry extends LightningModal {
     getCLI(result){ 
         try{
             if(result){
-                console.log(result);
+                // console.log(result);
+                console.log('Time Report Api: ' + this.timeReportAPI);
+                console.log('Selected Row: ' + this.selectedRowID);
+                console.log(this.formatTimeEntry());
                 
             }
         }catch (error){
             console.log("ERROR: "+ error);
         }
 
+    }
+
+    formatTimeEntry(){
+        this.selectedRowID.forEach(element => {
+            console.log(element);
+            
+        });
     }
 
 

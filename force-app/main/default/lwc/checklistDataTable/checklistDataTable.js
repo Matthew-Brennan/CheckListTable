@@ -4,12 +4,14 @@ import updateTasks from "@salesforce/apex/ChecklistController.updateTasks";
 import createNewTask from "@salesforce/apex/ChecklistController.newTask";
 import deleteTasks from "@salesforce/apex/ChecklistController.deleteTasks";
 import getTypeOfObj from "@salesforce/apex/ChecklistController.getTypeOfObject";
+import getUser from '@salesforce/apex/ChecklistController.getUserInfo';
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
 import LightningModal from 'lightning/modal';
 import csvModal from 'c/checkListDataLoader'
 import timeEntryModal from 'c/checkListTimeEntry'
+import Id from '@salesforce/user/Id';
 
 const columns = [
     { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
@@ -24,6 +26,8 @@ const actions = [
     { label: 'New Task', name: 'new' },
 ];
 
+
+
 export default class ChecklistDataTable extends LightningElement {
     @track checkList = [];
     columns = columns;
@@ -31,6 +35,9 @@ export default class ChecklistDataTable extends LightningElement {
     passedChklistId;
     draftValues = [];
     error;
+    userId = Id;
+
+    timeEntry = [];
 
     @track isModalOpen = false; // Track modal state
     @track toTimeEntry = false; // track time entry modal state
@@ -131,6 +138,7 @@ export default class ChecklistDataTable extends LightningElement {
     handleRowSelection(event) {
         const selectedRows = event.detail.selectedRows;
         this.selectedRowsID = selectedRows.map(selectedRows => selectedRows.Id);
+        
 
     }
 
@@ -189,6 +197,24 @@ export default class ChecklistDataTable extends LightningElement {
 
         //open the Time Entry Modal
         async handleTimeOpen() {
+            console.log('THE USER ID' + this.userId)
+            console.log('userID things: '+ await getUser(this.userId));
+
+            this.timeEntry.push(this.recordId); //[0] Case
+            this.timeEntry.push(this.userId);   //[1] User
+            this.timeEntry.push(this.userId);   //[2] Type of Support
+            this.timeEntry.push(this.userId);   //[3] Charge Out Position
+            this.timeEntry.push(this.userId);   //[4] Charge Out Rage
+            this.timeEntry.push(this.userId);   //[5] Billing Company
+
+            if(this.selectedRows){
+                this.selectedRows.forEach(element => {
+                    this.timeEntry.push(element.Name);              //[6] Description of work
+                    this.timeEntry.push(element.WBS__c);            //[7] WBS
+                    this.timeEntry.push(element.Actual_Hours__c);   //[8] Hours Worked
+                });
+            }
+
             try {
                 const result = await timeEntryModal.open({
                     label: 'Time Entry',
@@ -197,6 +223,8 @@ export default class ChecklistDataTable extends LightningElement {
                     component: 'c-check-list-time-entry',
                     checklistId: this.passedChklistId,
                     caseId: this.recordId,
+                    selectedRowID: this.selectedRowsID,
+                    timeEntry: this.timeEntry,
                 });
                 if (result === 'saved') {
                     this.refreshData();

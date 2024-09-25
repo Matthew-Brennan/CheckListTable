@@ -110,4 +110,24 @@ public with sharing class ChecklistController {
         // Return the newly created checklist item
         return newTask;
     }
+
+    @AuraEnabled  // Enables this method to be called from Aura or LWC
+    public static string getUserInfo(String userId) {
+        
+        //get user role
+        List<User> userRoleId = [SELECT UserRoleId
+                    FROM User
+                    WHERE Id = :userId];
+        system.debug(userRoleId[0].UserRoleId);
+
+        //get the name which is info That is actually usefull because it is know
+        List<UserRole> userRoleName = [SELECT Name 
+                        FROM UserRole
+                        WHERE Id = :userRoleId[0].UserRoleId];
+
+        system.debug(userRoleName);
+
+        // Return the newly created checklist item
+        return userRoleName[0].Name;
+    }
 }

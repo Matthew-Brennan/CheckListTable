@@ -101,4 +101,35 @@ private class ChecklistControllerTest {
         Test.stopTest();  // End the test context
 
     }
+
+    @isTest
+    static void testGetUser() {
+        // Create and insert a test Role record
+        UserRole testRole = new UserRole();
+        testRole.Name = 'Test Role';
+        insert testRole;
+
+        // Create and insert a test User record
+        User testUser = new User();
+        testUser.FirstName = 'Test22';
+        testUser.LastName = 'User22';
+        testUser.UserRoleId = testRole.Id;
+        testUser.Username='test22@test.ca'; 
+        testUser.Email='test@test.ca'; 
+        testUser.Alias='test';
+        testUser.TimeZoneSidKey='America/New_York'; 
+        testUser.LocaleSidKey='en_CA';
+        testUser.EmailEncodingKey='UTF-8';
+        testUser.ProfileId='00e32000001NtC9AAK';
+        testUser.LanguageLocaleKey='en_US';
+        insert testUser;
+
+        // Start the test context to measure the execution of the code
+        Test.startTest();
+        // Call the newTask method from ChecklistController with the test Checklist ID
+        ChecklistController.getUserInfo(testUser.Id);
+        Test.stopTest();  // End the test context
+        
+        // You can add assertions here to verify the expected outcome of the result
+    }
 }
