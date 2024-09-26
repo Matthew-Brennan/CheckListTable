@@ -228,15 +228,7 @@ export default class ChecklistDataTable extends LightningElement {
                 console.log('row selected')
                 this.timeEntry.push(this.chosenRows[0].Name);              //[6] Description of work
                 this.timeEntry.push(this.chosenRows[0].WBS__c.toString());            //[7] WBS
-                //this.timeEntry.push(this.chosenRows[0].Actual_Hours__c.toString());   //[8] Hours Worked
             }   
-
-            console.log(this.selectedRows);
-            // this.timeEntry.push(this.selectedRows);                  //[6] Description of work
-            // this.timeEntry.push(this.selectedRows);                  //[7] WBS
-            // this.timeEntry.push(this.selectedRows.Actual_Hours__c);   //[8] Hours Worked
-
-            console.log(this.timeEntry);
 
             try {
                 const result = await timeEntryModal.open({

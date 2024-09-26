@@ -25,8 +25,8 @@
                 <lightning-input-field field-name="Type_of_Support__c" value={Tos}> </lightning-input-field>
                 <lightning-input-field field-name="Description_of_Work__c" value={descOfWork}> </lightning-input-field>
                 <lightning-input-field field-name="WBS__c" value={wbsNum}> </lightning-input-field>
-                <lightning-input-field field-name="Hours_Worked__c" value={hoursWorked}> </lightning-input-field>
-                <lightning-input-field field-name="OT_Hours_Worked__c"> </lightning-input-field>
+                <lightning-input-field field-name="Hours_Worked__c" value={hoursWorked} onchange={handleHW}> </lightning-input-field>
+                <lightning-input-field field-name="OT_Hours_Worked__c" onchange={handleOT}> </lightning-input-field>
                 <lightning-input-field field-name="Charge_Out_Position__c" value={chargeOutPos}> </lightning-input-field>
                 <lightning-input-field field-name="Charge_Out_Rate__c" value={chargeOutRate}> </lightning-input-field>
                 <lightning-input-field field-name="Billing_Company__c" value={billingCompany}> </lightning-input-field>
@@ -36,6 +36,7 @@
                 class="slds-m-top_small"
                 type="submit"
                 label="Create new"
+                onclick={handleSubmit}
             >
             </lightning-button>
         

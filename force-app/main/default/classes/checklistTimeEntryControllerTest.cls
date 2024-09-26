@@ -40,4 +40,35 @@ public with sharing class checklistTimeEntryControllerTest {
         System.debug(itemRecieved);
 
     }
+
+    @isTest 
+    public static void timeEntryUpdateTest () {
+        // Create and insert a test Checklist record
+        Checklist__c testList = new Checklist__c();
+        testList.Name = 'Test List';
+        insert testList;
+
+        Checklist_Item__c item = new Checklist_Item__c();
+        item.Name = 'Test Item';
+        item.Status__c = false;
+        item.Checklist__c = testList.Id;
+        insert item;
+
+        Checklist_Item__c item2 = new Checklist_Item__c();
+        item2.Name = 'returned Item';
+        item2.Status__c = true;
+        item2.WBS__c = 1.0;
+        item2.Actual_Hours__c = 2;
+        item2.Checklist__c = testList.Id;
+        insert item2;
+
+        Decimal totalHours = 2;
+
+        string passedId = item2.id;
+
+
+        Test.startTest();
+        checklistTimeEntryController.updateCheckListEntry(passedId, totalHours);
+        Test.stopTest();
+    }
 }

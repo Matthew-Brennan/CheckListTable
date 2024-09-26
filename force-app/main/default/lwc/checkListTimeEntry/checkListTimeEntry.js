@@ -3,6 +3,7 @@ import insertLine from '@salesforce/apex/lwcCSVUploaderController.insertNewEleme
 import { ShowToastEvent } from 'lightning/platformShowToastEvent'; // Importing Toast event to show notifications
 import LightningModal from 'lightning/modal'; // Importing Lightning Modal for creating modal dialogs
 import getCLI from '@salesforce/apex/checklistTimeEntryController.checklistTimeEntryController'
+import updateCLI from '@salesforce/apex/checklistTimeEntryController.updateCheckListEntry'
 //import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
 export default class CheckListTimeEntry extends LightningModal {
 
@@ -39,7 +40,7 @@ export default class CheckListTimeEntry extends LightningModal {
                 this.billingCompany = this.timeEntry[5];
                 this.descOfWork  = this.timeEntry[6];
                 this.wbsNum = this.timeEntry[7];
-                this.hoursWorked = this.timeEntry[8];
+                //this.hoursWorked = this.timeEntry[8];
                 
                 console.log(this.formatTimeEntry());
                 
@@ -71,5 +72,28 @@ export default class CheckListTimeEntry extends LightningModal {
         console.log('closed');
         timeEntry = '';
         return 'saved'; // Return 'saved' as a confirmation
-    }  
+    } 
+
+    handleHW(event){
+        this.hoursWorked = event.detail.value[0];
+    }
+
+    handleOT(event){
+        this.otHours = event.detail.value[0];
+        this.otHours *= 1.5
+    }
+    
+    async handleSubmit() {
+        console.log('Case: ' + this.caseId);
+        console.log('ROW: ' + this.selectedRowID);
+        console.log('TIME: ' + this.hoursWorked);
+        console.log('OT: ' + this.otHours);
+
+        const totalTime = this.hoursWorked + this.otHours;
+
+        const returnVal = await updateCLI({cliId: this.selectedRowID, totalHours: totalTime,});
+        console.log(returnVal);
+    }
+
+
 }
