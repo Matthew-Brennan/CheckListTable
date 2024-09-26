@@ -5,6 +5,8 @@ import createNewTask from "@salesforce/apex/ChecklistController.newTask";
 import deleteTasks from "@salesforce/apex/ChecklistController.deleteTasks";
 import getTypeOfObj from "@salesforce/apex/ChecklistController.getTypeOfObject";
 import getUser from '@salesforce/apex/ChecklistController.getUserInfo';
+import getCase from '@salesforce/apex/ChecklistController.getCaseInfo'
+import getTOS from '@salesforce/apex/ChecklistController.getTOS';
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
@@ -197,23 +199,38 @@ export default class ChecklistDataTable extends LightningElement {
 
         //open the Time Entry Modal
         async handleTimeOpen() {
-            console.log('THE USER ID' + this.userId)
-            console.log('userID things: '+ await getUser(this.userId));
+            const usr = await getUser({userId: this.userId});
+            const cse = await getCase({caseId: this.recordId});
+            const tos = await getTOS({caseId: this.recordId});
 
+            console.log('CASE FROM CASE: ' + cse);
+            console.log('CASE FROM CASE: ' + cse);
+            console.log('CASE FROM CASE: ' + cse);
             this.timeEntry.push(this.recordId); //[0] Case
             this.timeEntry.push(this.userId);   //[1] User
-            this.timeEntry.push(this.userId);   //[2] Type of Support
-            this.timeEntry.push(this.userId);   //[3] Charge Out Position
-            this.timeEntry.push(this.userId);   //[4] Charge Out Rage
-            this.timeEntry.push(this.userId);   //[5] Billing Company
+            this.timeEntry.push(tos);           //[2] Type of Support
 
-            if(this.selectedRows){
-                this.selectedRows.forEach(element => {
-                    this.timeEntry.push(element.Name);              //[6] Description of work
-                    this.timeEntry.push(element.WBS__c);            //[7] WBS
-                    this.timeEntry.push(element.Actual_Hours__c);   //[8] Hours Worked
-                });
+            
+            
+            if (usr == 'L1'){
+                this.timeEntry.push('Jr. Technician Rate');     //[3] Charge Out Position
+                this.timeEntry.push('140');                     //[4] Charge Out Rage
+            }else{ 
+                this.timeEntry.push('Sr. Technician Rate');     //[3] Charge Out Position
+                this.timeEntry.push('160');                     //[4] Charge Out Rate
             }
+             
+             this.timeEntry.push(cse);   //[5] Billing Company
+
+            // if(this.selectedRows){
+            //     this.selectedRows.forEach(element => {
+            //         this.timeEntry.push(element.Name);              //[6] Description of work
+            //         this.timeEntry.push(element.WBS__c);            //[7] WBS
+            //         this.timeEntry.push(element.Actual_Hours__c);   //[8] Hours Worked
+            //     });
+            // }
+
+            console.log(this.timeEntry);
 
             try {
                 const result = await timeEntryModal.open({

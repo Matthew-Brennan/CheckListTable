@@ -111,23 +111,65 @@ public with sharing class ChecklistController {
         return newTask;
     }
 
-    @AuraEnabled  // Enables this method to be called from Aura or LWC
-    public static string getUserInfo(String userId) {
-        
-        //get user role
-        List<User> userRoleId = [SELECT UserRoleId
-                    FROM User
-                    WHERE Id = :userId];
-        system.debug(userRoleId[0].UserRoleId);
+    @AuraEnabled
+    public static String getUserInfo(String userId) {
+        try {
+            // Query for the user's role ID
+            List<User> userRoleId = [SELECT UserRoleId FROM User WHERE Id = :userId];
+    
+            // Check if the user has a role
+            if (userRoleId.isEmpty() || userRoleId[0].UserRoleId == null) {
+                return 'No role assigned';
+            }
+    
+            // Query the role name based on the role ID
+            List<UserRole> userRoleName = [SELECT Name FROM UserRole WHERE Id = :userRoleId[0].UserRoleId];
+    
+            // Return the role name, or handle the case if no role is found
+            if (!userRoleName.isEmpty()) {
+                return userRoleName[0].Name;
+            } else {
+                return 'No role found for the user';
+            }
+        } catch (Exception e) {
+            // Return error message for debugging purposes
+            throw new AuraHandledException('Error retrieving user role: ' + e.getMessage());
+        }
+    }
 
-        //get the name which is info That is actually usefull because it is know
-        List<UserRole> userRoleName = [SELECT Name 
-                        FROM UserRole
-                        WHERE Id = :userRoleId[0].UserRoleId];
+    @AuraEnabled
+    public static string getCaseInfo(String caseId) {
+        try {
+            // Query for the user's role ID
+            list<Case> cse = [SELECT Billing_Company__c FROM Case WHERE Id = :caseId];
 
-        system.debug(userRoleName);
+            
+            if (!cse.isEmpty()) {
+                return cse[0].Billing_Company__c;
+            } else {
+                return 'No company found for the case';
+            }
+        } catch (Exception e) {
+            // Return error message for debugging purposes
+            throw new AuraHandledException('Error retrieving case: ' + e.getMessage());
+        }
+    }
 
-        // Return the newly created checklist item
-        return userRoleName[0].Name;
+    @AuraEnabled
+    public static string getTOS(String caseId) {
+        try {
+            // Query for the user's role ID
+            list<Case> cse = [SELECT Type_of_Support__c FROM Case WHERE Id = :caseId];
+
+            
+            if (!cse.isEmpty()) {
+                return cse[0].Type_of_Support__c;
+            } else {
+                return 'No tos found for the case';
+            }
+        } catch (Exception e) {
+            // Return error message for debugging purposes
+            throw new AuraHandledException('Error retrieving case: ' + e.getMessage());
+        }
     }
 }
