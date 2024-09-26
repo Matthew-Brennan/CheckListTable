@@ -40,6 +40,7 @@
         <!-- Data Table -->
         <template if:true={checkList}>
             <lightning-datatable
+                max-row-select ='1'
                 key-field="Id"
                 data={checkList}
                 columns={columns}

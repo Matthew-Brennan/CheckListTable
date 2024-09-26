@@ -38,7 +38,7 @@ export default class ChecklistDataTable extends LightningElement {
     draftValues = [];
     error;
     userId = Id;
-
+    chosenRows
     timeEntry = [];
 
     @track isModalOpen = false; // Track modal state
@@ -139,8 +139,10 @@ export default class ChecklistDataTable extends LightningElement {
 
     handleRowSelection(event) {
         const selectedRows = event.detail.selectedRows;
+        this.chosenRows = selectedRows;
         this.selectedRowsID = selectedRows.map(selectedRows => selectedRows.Id);
-        
+        console.log(selectedRows);
+        console.log(this.chosenRows);
 
     }
 
@@ -199,13 +201,11 @@ export default class ChecklistDataTable extends LightningElement {
 
         //open the Time Entry Modal
         async handleTimeOpen() {
+            console.log('successful change made');
             const usr = await getUser({userId: this.userId});
             const cse = await getCase({caseId: this.recordId});
             const tos = await getTOS({caseId: this.recordId});
 
-            console.log('CASE FROM CASE: ' + cse);
-            console.log('CASE FROM CASE: ' + cse);
-            console.log('CASE FROM CASE: ' + cse);
             this.timeEntry.push(this.recordId); //[0] Case
             this.timeEntry.push(this.userId);   //[1] User
             this.timeEntry.push(tos);           //[2] Type of Support
@@ -220,15 +220,21 @@ export default class ChecklistDataTable extends LightningElement {
                 this.timeEntry.push('160');                     //[4] Charge Out Rate
             }
              
-             this.timeEntry.push(cse);   //[5] Billing Company
+            //TODO fix the picklist values for this so it works because the TR and Case equvilant values arent teh same string
+             this.timeEntry.push('Eastbay Cloud Services Ltd.');   //[5] Billing Company
 
-            // if(this.selectedRows){
-            //     this.selectedRows.forEach(element => {
-            //         this.timeEntry.push(element.Name);              //[6] Description of work
-            //         this.timeEntry.push(element.WBS__c);            //[7] WBS
-            //         this.timeEntry.push(element.Actual_Hours__c);   //[8] Hours Worked
-            //     });
-            // }
+             
+            if(this.chosenRows){
+                console.log('row selected')
+                this.timeEntry.push(this.chosenRows[0].Name);              //[6] Description of work
+                this.timeEntry.push(this.chosenRows[0].WBS__c.toString());            //[7] WBS
+                //this.timeEntry.push(this.chosenRows[0].Actual_Hours__c.toString());   //[8] Hours Worked
+            }   
+
+            console.log(this.selectedRows);
+            // this.timeEntry.push(this.selectedRows);                  //[6] Description of work
+            // this.timeEntry.push(this.selectedRows);                  //[7] WBS
+            // this.timeEntry.push(this.selectedRows.Actual_Hours__c);   //[8] Hours Worked
 
             console.log(this.timeEntry);
 
@@ -249,6 +255,7 @@ export default class ChecklistDataTable extends LightningElement {
             } catch {
                 console.log('Error opening modal:'+ result.error);
             }
+            this.timeEntry.splice(0,this.timeEntry);
         }
     
         //Close the modal
