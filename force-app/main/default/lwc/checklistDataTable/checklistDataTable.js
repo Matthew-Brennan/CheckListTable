@@ -16,6 +16,7 @@ import timeEntryModal from 'c/checkListTimeEntry'
 import signaturePad from 'c/nameAndSignatureCapture'
 import Id from '@salesforce/user/Id';
 
+
 const columns = [
     { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
     { label: 'WBS', fieldName: 'WBS__c', editable: true, sortable: true },

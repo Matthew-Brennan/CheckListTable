@@ -1,6 +1,34 @@
 @isTest
 private class ChecklistControllerTest {
 
+    //two instances are needed to test, 1 with a case 1 with a checklist
+    @isTest
+    static void testgetChecklistItems(){
+        // Create and insert a test Checklist record
+        Checklist__c testList = new Checklist__c();
+        testList.Name = 'Test List';
+        insert testList;
+
+        // Create and insert a test Checklist_Item record associated with the test Checklist
+        Checklist_Item__c item = new Checklist_Item__c();
+        item.Name = 'Test Item';
+        item.Status__c = false;
+        item.Checklist__c = testList.Id;
+        insert item;
+
+        Case testCase = new Case();
+        testCase.Subject = 'test case';
+        testCase.Checklist__c = testList.Id;
+        insert testCase;
+
+
+        Test.startTest();
+            ChecklistController.getChecklistItems(testList.Id);   //passes
+            ChecklistController.getChecklistItems(null);  //returns error due to no CheckLists Items
+            ChecklistController.getChecklistItems(testCase.Id);   //Passes
+        Test.stopTest();  // End the test context
+    }
+
     // Test method to verify the creation of a new checklist task
     @isTest
     static void testNewTask() {
@@ -45,32 +73,35 @@ private class ChecklistControllerTest {
         
     }
 
-    @isTest
-    static void testupdateTaks(){
-        // Create and insert a test Checklist record
-        Checklist__c testList = new Checklist__c();
-        testList.Name = 'Test List';
-        insert testList;
+    // @isTest
+    // static void testupdateTaks(){
+    //     // Create and insert a test Checklist record
+    //     Checklist__c testList = new Checklist__c();
+    //     testList.Name = 'Test List';
+    //     insert testList;
 
-        // Create and insert a test Checklist_Item record associated with the test Checklist
-        Checklist_Item__c item = new Checklist_Item__c();
-        item.Name = 'Test Item';
-        item.Status__c = false;
-        item.Checklist__c = testList.Id;
-        insert item;
+    //     // Create and insert a test Checklist_Item record associated with the test Checklist
+    //     Checklist_Item__c item = new Checklist_Item__c();
+    //     item.Name = 'Test Item';
+    //     item.Status__c = false;
+    //     item.Checklist__c = testList.Id;
+    //     insert item;
+    //     item.Name = 'CHANGED NAME Item';
 
-        Checklist_Item__c item2 = new Checklist_Item__c();
-        item2.Name = 'CHANGED';
-        item2.Status__c = false;
-        item2.Checklist__c = testList.Id;
-        insert item2;
+    //     // Checklist_Item__c item2 = new Checklist_Item__c();
+    //     // item2.Name = 'CHANGED';
+    //     // item2.Status__c = false;
+    //     // item2.Checklist__c = testList.Id;
+    //     // insert item2;
 
-        string data = json.serialize(item2);
+    //     string data = json.serialize(item);
         
-    
-        ChecklistController.updateTasks(data);
+    // // Start the test context to measure the execution of the code
+    //     Test.startTest();
+    //     ChecklistController.updateTasks(data);
+    //     Test.stopTest();  // End the test context
 
-    }
+    // }
 
     @isTest
     static void testgetTypeOfObject() {
@@ -132,4 +163,51 @@ private class ChecklistControllerTest {
         
         // You can add assertions here to verify the expected outcome of the result
     }
+
+    @isTest
+    static void testUpdateTasksSuccess() {
+
+         // Create and insert a test Checklist record
+        Checklist__c testList = new Checklist__c();
+        testList.Name = 'Test List';
+        insert testList;
+        
+        List<Checklist_Item__c> testItems = new List<Checklist_Item__c>();
+        for (Integer i = 0; i < 3; i++) {
+            testItems.add(new Checklist_Item__c(
+                Name = 'Test Item ' + i,
+                Status__c = false,
+                Checklist__c = testList.Id
+            ));
+        }
+        insert testItems;
+
+        // Prepare update data
+        List<Checklist_Item__c> updatedItems = new List<Checklist_Item__c>();
+        for (Checklist_Item__c item : testItems) {
+            updatedItems.add(new Checklist_Item__c(
+                Id = item.Id,
+                Status__c = true,
+                Checklist__c = testList.Id
+            ));
+        }
+
+        // Convert to JSON
+        String jsonData = JSON.serialize(updatedItems);
+
+        // Call the method
+        Test.startTest();
+        String result = ChecklistController.updateTasks(JSON.deserializeUntyped(jsonData));
+        Test.stopTest();
+
+        // Assert the result
+        System.assertEquals('Success: tasks updated successfully', result, 'Update should be successful');
+
+        // Verify the updates
+        List<Checklist_Item__c> verifyItems = [SELECT Id, Status__c FROM Checklist_Item__c WHERE Id IN :testItems];
+        for (Checklist_Item__c item : verifyItems) {
+            System.assertEquals(true, item.Status__c, 'Status should be updated to In Progress');
+        }
+    }
+
 }

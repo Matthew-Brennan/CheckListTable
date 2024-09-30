@@ -88,6 +88,9 @@ export default class CheckListTimeEntry extends LightningModal {
 
     async handleTRSuccess(event){
         this.timeID = event.detail.id;
+
+        // Wait for a moment to ensure the record is fully created
+        await new Promise(resolve => setTimeout(resolve, 1000));
         // Query the child component (assuming it's present in the template)
         const signatureComponent = this.template.querySelector('c-name-and-signature-capture');
 

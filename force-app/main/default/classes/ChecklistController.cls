@@ -139,37 +139,31 @@ public with sharing class ChecklistController {
 
     @AuraEnabled
     public static string getCaseInfo(String caseId) {
-        try {
-            // Query for the user's role ID
-            list<Case> cse = [SELECT Billing_Company__c FROM Case WHERE Id = :caseId];
 
-            
-            if (!cse.isEmpty()) {
-                return cse[0].Billing_Company__c;
-            } else {
-                return 'No company found for the case';
-            }
-        } catch (Exception e) {
-            // Return error message for debugging purposes
-            throw new AuraHandledException('Error retrieving case: ' + e.getMessage());
+        // Query for the user's role ID
+        list<Case> cse = [SELECT Billing_Company__c FROM Case WHERE Id = :caseId];
+
+        
+        if (!cse.isEmpty()) {
+            return cse[0].Billing_Company__c;
+        } else {
+            return 'No company found for the case';
         }
+
     }
 
     @AuraEnabled
     public static string getTOS(String caseId) {
-        try {
-            // Query for the user's role ID
-            list<Case> cse = [SELECT Type_of_Support__c FROM Case WHERE Id = :caseId];
 
-            
-            if (!cse.isEmpty()) {
-                return cse[0].Type_of_Support__c;
-            } else {
-                return 'No tos found for the case';
-            }
-        } catch (Exception e) {
-            // Return error message for debugging purposes
-            throw new AuraHandledException('Error retrieving case: ' + e.getMessage());
+        // Query for the user's role ID
+        list<Case> cse = [SELECT Type_of_Support__c FROM Case WHERE Id = :caseId];
+
+        
+        if (!cse.isEmpty()) {
+            return cse[0].Type_of_Support__c;
+        } else {
+            return 'No tos found for the case';
         }
+
     }
 }
