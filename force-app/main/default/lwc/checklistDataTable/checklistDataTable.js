@@ -13,6 +13,7 @@ import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
 import LightningModal from 'lightning/modal';
 import csvModal from 'c/checkListDataLoader'
 import timeEntryModal from 'c/checkListTimeEntry'
+import signaturePad from 'c/nameAndSignatureCapture'
 import Id from '@salesforce/user/Id';
 
 const columns = [
@@ -40,6 +41,7 @@ export default class ChecklistDataTable extends LightningElement {
     userId = Id;
     chosenRows
     timeEntry = [];
+    TimeEntryBool =  false;
 
     @track isModalOpen = false; // Track modal state
     @track toTimeEntry = false; // track time entry modal state
@@ -141,14 +143,18 @@ export default class ChecklistDataTable extends LightningElement {
         const selectedRows = event.detail.selectedRows;
         this.chosenRows = selectedRows;
         this.selectedRowsID = selectedRows.map(selectedRows => selectedRows.Id);
-        console.log(selectedRows);
-        console.log(this.chosenRows);
+
+        if (selectedRows.length == 1)
+        {
+            this.TimeEntryBool = true;
+        }
+        else{
+            this.TimeEntryBool = false;
+        }
 
     }
 
     async handleClickDelete() {
-        console.log('Delete button clicked');
-        console.log('Selected rows:', this.selectedRowsID);
         const result = confirm('Are you sure you want to delete the selected tasks?');
         if (result) {
             try {
@@ -201,7 +207,7 @@ export default class ChecklistDataTable extends LightningElement {
 
         //open the Time Entry Modal
         async handleTimeOpen() {
-            console.log('successful change made');
+            this.timeEntry = []
             const usr = await getUser({userId: this.userId});
             const cse = await getCase({caseId: this.recordId});
             const tos = await getTOS({caseId: this.recordId});
@@ -225,9 +231,9 @@ export default class ChecklistDataTable extends LightningElement {
 
              
             if(this.chosenRows){
-                console.log('row selected')
+
                 this.timeEntry.push(this.chosenRows[0].Name);              //[6] Description of work
-                this.timeEntry.push(this.chosenRows[0].WBS__c.toString());            //[7] WBS
+                this.chosenRows[0].WBS__c ? this.timeEntry.push(this.chosenRows[0].WBS__c.toString()) : this.timeEntry.push('0');            //[7] WBS if blank put 0
             }   
 
             try {
@@ -247,7 +253,7 @@ export default class ChecklistDataTable extends LightningElement {
             } catch {
                 console.log('Error opening modal:'+ result.error);
             }
-            this.timeEntry.splice(0,this.timeEntry);
+            this.timeEntry = [];
         }
     
         //Close the modal
@@ -258,6 +264,9 @@ export default class ChecklistDataTable extends LightningElement {
         async handleTimeClose() {
             this.refreshData();
             this.toTimeEntry = false;
+            console.log(this.timeEntry);
+            this.timeEntry = [];
+            console.log(this.timeEntry);
         }
     
         //save the info added by the modal probably wont use as the info should be added from the modal LWC itself

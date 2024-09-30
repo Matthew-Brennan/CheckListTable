@@ -4,24 +4,26 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent'; // Importing 
 import LightningModal from 'lightning/modal'; // Importing Lightning Modal for creating modal dialogs
 import getCLI from '@salesforce/apex/checklistTimeEntryController.checklistTimeEntryController'
 import updateCLI from '@salesforce/apex/checklistTimeEntryController.updateCheckListEntry'
+
+
 //import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
 export default class CheckListTimeEntry extends LightningModal {
 
     @api caseId;       // Expose case record ID to the component to receive data from the parent component
-    @api checklistId   // Expose checklist record ID to the component to receive data from the parent component
-    @api selectedRowID //
-    @api timeEntry
-    theCase = ''
-    theUser = ''
-    Tos = ''
-    wbsNum = ''
-    hoursWorked = ''
-    otHours = ''
-    chargeOutPos = ''
-    chargeOutRate = ''
-    billingCompany = ''
-    descOfWork = ''
-
+    @api checklistId;   // Expose checklist record ID to the component to receive data from the parent component
+    @api selectedRowID ;//
+    @api timeEntry;
+    theCase = '';
+    theUser = '';
+    Tos = '';
+    wbsNum = '';
+    hoursWorked = 0;
+    otHours = 0;
+    chargeOutPos = '';
+    chargeOutRate = '';
+    billingCompany = '';
+    descOfWork = '';
+    timeID = this.caseId;
     //Time Reporting Object Fields
     timeReportAPI = 'SFDC_Time_Reporting__c';
 
@@ -42,7 +44,7 @@ export default class CheckListTimeEntry extends LightningModal {
                 this.wbsNum = this.timeEntry[7];
                 //this.hoursWorked = this.timeEntry[8];
                 
-                console.log(this.formatTimeEntry());
+
                 
             }
         }catch (error){
@@ -51,26 +53,18 @@ export default class CheckListTimeEntry extends LightningModal {
 
     }
 
-    formatTimeEntry(){
-        if(this.selectedRowId){
-            this.selectedRowID.forEach(element => {
-                console.log(element);
-                
-            });
-        }
-    }
-
 
     // Invoked when the user clicks the save button; starts the file upload process
     handleSave() {
         console.log('Case: ' + this.caseId);
+        this.timeEntry = [];
     }
 
     // Closes the modal window
     handleClose() {
         this.close(); // Close the modal
         console.log('closed');
-        timeEntry = '';
+        this.timeEntry = [];
         return 'saved'; // Return 'saved' as a confirmation
     } 
 
@@ -84,16 +78,27 @@ export default class CheckListTimeEntry extends LightningModal {
     }
     
     async handleSubmit() {
-        console.log('Case: ' + this.caseId);
-        console.log('ROW: ' + this.selectedRowID);
-        console.log('TIME: ' + this.hoursWorked);
-        console.log('OT: ' + this.otHours);
+        const rowId = this.selectedRowID.toString(); // set the rowId for the Checklist item being updated to a string
+        const totalTime = parseFloat(this.hoursWorked) + parseFloat(this.otHours); // add the two values of OT hours and regular hours as a decimal
 
-        const totalTime = this.hoursWorked + this.otHours;
+        await updateCLI({cliId: rowId, totalHours: totalTime,});
+        this.timeEntry = [];
 
-        const returnVal = await updateCLI({cliId: this.selectedRowID, totalHours: totalTime,});
-        console.log(returnVal);
     }
 
+    async handleTRSuccess(event){
+        this.timeID = event.detail.id;
+        // Query the child component (assuming it's present in the template)
+        const signatureComponent = this.template.querySelector('c-name-and-signature-capture');
+
+        // Call the saveSignature method from the child component
+        if (signatureComponent) {
+            await signatureComponent.saveSignature();  // Calling the method from the child component
+            
+        } else {
+            console.error('Signature component not found');
+        }
+        
+    }
 
 }

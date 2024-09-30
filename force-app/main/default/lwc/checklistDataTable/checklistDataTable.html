@@ -19,19 +19,22 @@
             style="padding-right: 14px;"
         ></lightning-button-icon>
 
+        <!-- Delete Button -->
         <lightning-button 
             variant="destructive" 
             label="Delete" 
             onclick={handleClickDelete}
         ></lightning-button>
 
+        <!-- Data Loader Button -->
         <lightning-button 
             variant="Success" 
             label="Data Loader" 
             onclick={handleModalOpen}
         ></lightning-button>
 
-        <lightning-button 
+        <!-- Time Entries Button -->
+        <lightning-button if:true={TimeEntryBool}
             variant="Success" 
             label="Time Entries" 
             onclick={handleTimeOpen}
