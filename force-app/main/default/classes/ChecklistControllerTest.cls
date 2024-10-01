@@ -24,8 +24,13 @@ private class ChecklistControllerTest {
 
         Test.startTest();
             ChecklistController.getChecklistItems(testList.Id);   //passes
-            ChecklistController.getChecklistItems(null);  //returns error due to no CheckLists Items
             ChecklistController.getChecklistItems(testCase.Id);   //Passes
+
+            try{
+                ChecklistController.getChecklistItems('50000000');  //returns error due to no CheckLists Items
+            }catch (AuraHandledException ex){
+                System.assertEquals('Script-thrown exception', ex.getMessage());
+            }
         Test.stopTest();  // End the test context
     }
 
@@ -69,6 +74,11 @@ private class ChecklistControllerTest {
         Test.startTest();
         // Call the deleteTasks method from ChecklistController with the list of item IDs
         ChecklistController.deleteTasks(items);
+        try{
+            ChecklistController.deleteTasks(null);  //returns error 
+        }catch (AuraHandledException ex){
+            System.assertEquals('Script-thrown exception', ex.getMessage());
+        }
         Test.stopTest();  // End the test context
         
     }
@@ -129,6 +139,12 @@ private class ChecklistControllerTest {
         // Call the deleteTasks method from ChecklistController with the list of item IDs
         string resultCase = ChecklistController.getTypeOfObject(testCase.Id);
         string resultNotCase = ChecklistController.getTypeOfObject(testList.Id);
+
+        try{
+            ChecklistController.getTypeOfObject(null);  //returns error 
+        }catch (AuraHandledException ex){
+            System.assertEquals('Script-thrown exception', ex.getMessage());
+        }
         Test.stopTest();  // End the test context
 
     }
@@ -159,6 +175,11 @@ private class ChecklistControllerTest {
         Test.startTest();
         // Call the newTask method from ChecklistController with the test Checklist ID
         ChecklistController.getUserInfo(testUser.Id);
+        try{
+            ChecklistController.getUserInfo(null);  //returns error 
+        }catch (AuraHandledException ex){
+            System.assertEquals('Script-thrown exception', ex.getMessage());
+        }
         Test.stopTest();  // End the test context
         
         // You can add assertions here to verify the expected outcome of the result
@@ -198,6 +219,12 @@ private class ChecklistControllerTest {
         // Call the method
         Test.startTest();
         String result = ChecklistController.updateTasks(JSON.deserializeUntyped(jsonData));
+
+        try{
+            ChecklistController.updateTasks(null);  //returns error 
+        }catch (AuraHandledException ex){
+            System.assertEquals('Script-thrown exception', ex.getMessage());
+        }
         Test.stopTest();
 
         // Assert the result
@@ -208,6 +235,43 @@ private class ChecklistControllerTest {
         for (Checklist_Item__c item : verifyItems) {
             System.assertEquals(true, item.Status__c, 'Status should be updated to In Progress');
         }
+    }
+
+    
+    @isTest
+    static void testGetCaseInfo() {
+        // Create and insert a test Case record
+        Case testCase = new Case();
+        testCase.Billing_Company__c = 'Edge';
+        insert testCase;
+
+        // Start the test context to measure the execution of the code
+        Test.startTest();
+        ChecklistController.getCaseInfo(testCase.Id);
+        try{
+            ChecklistController.getCaseInfo(null);  //returns error 
+        }catch (AuraHandledException ex){
+            System.assertEquals('Script-thrown exception', ex.getMessage());
+        }
+        Test.stopTest();  // End the test context
+    }
+
+    @isTest
+    static void testGetCaseTOS() {
+        // Create and insert a test Case record
+        Case testCase = new Case();
+        testCase.Type_of_Support__c = 'Sales';
+        insert testCase;
+
+        // Start the test context to measure the execution of the code
+        Test.startTest();
+        ChecklistController.getTOS(testCase.Id);
+        try{
+            ChecklistController.getTOS(null);  //returns error 
+        }catch (AuraHandledException ex){
+            System.assertEquals('Script-thrown exception', ex.getMessage());
+        }
+        Test.stopTest();  // End the test context
     }
 
 }

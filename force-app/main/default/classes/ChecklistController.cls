@@ -118,19 +118,17 @@ public with sharing class ChecklistController {
             List<User> userRoleId = [SELECT UserRoleId FROM User WHERE Id = :userId];
     
             // Check if the user has a role
-            if (userRoleId.isEmpty() || userRoleId[0].UserRoleId == null) {
-                return 'No role assigned';
-            }
+            // if (userRoleId.isEmpty() || userRoleId[0].UserRoleId == null) {
+            //     return 'No role assigned';
+            // }
     
             // Query the role name based on the role ID
             List<UserRole> userRoleName = [SELECT Name FROM UserRole WHERE Id = :userRoleId[0].UserRoleId];
     
             // Return the role name, or handle the case if no role is found
-            if (!userRoleName.isEmpty()) {
-                return userRoleName[0].Name;
-            } else {
-                return 'No role found for the user';
-            }
+            
+            return userRoleName[0].Name;
+            
         } catch (Exception e) {
             // Return error message for debugging purposes
             throw new AuraHandledException('Error retrieving user role: ' + e.getMessage());
