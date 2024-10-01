@@ -32,9 +32,17 @@ public with sharing class checklistTimeEntryControllerTest {
         insert testCase;
 
         list<Checklist_Item__c> itemRecieved = new list<Checklist_Item__c>();
+        list<Checklist_Item__c> failedItem = new list<Checklist_Item__c>();
 
         Test.startTest();
         itemRecieved = checklistTimeEntryController.checklistTimeEntryController(testList.id);
+
+        try{
+            failedItem = checklistTimeEntryController.checklistTimeEntryController(null);  //returns error due to no CheckLists Items
+            
+        }catch (AuraHandledException ex){
+            System.assertEquals('Script-thrown excepti', ex.getMessage());
+        }
         Test.stopTest();
 
         System.debug(itemRecieved);
@@ -69,6 +77,12 @@ public with sharing class checklistTimeEntryControllerTest {
 
         Test.startTest();
         checklistTimeEntryController.updateCheckListEntry(passedId, totalHours);
+
+        try{
+            checklistTimeEntryController.updateCheckListEntry(null, null);  //returns error due to no CheckLists Items
+        }catch (AuraHandledException ex){
+            System.assertEquals('Script-thrown exception', ex.getMessage());
+        }
         Test.stopTest();
     }
 }

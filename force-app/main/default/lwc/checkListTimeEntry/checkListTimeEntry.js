@@ -42,10 +42,7 @@ export default class CheckListTimeEntry extends LightningModal {
                 this.billingCompany = this.timeEntry[5];
                 this.descOfWork  = this.timeEntry[6];
                 this.wbsNum = this.timeEntry[7];
-                //this.hoursWorked = this.timeEntry[8];
-                
-
-                
+                //this.hoursWorked = this.timeEntry[8];                
             }
         }catch (error){
             console.log("ERROR: "+ error);
@@ -56,7 +53,6 @@ export default class CheckListTimeEntry extends LightningModal {
 
     // Invoked when the user clicks the save button; starts the file upload process
     handleSave() {
-        console.log('Case: ' + this.caseId);
         this.timeEntry = [];
     }
 
@@ -83,6 +79,8 @@ export default class CheckListTimeEntry extends LightningModal {
 
         await updateCLI({cliId: rowId, totalHours: totalTime,});
         this.timeEntry = [];
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        this.handleClose();       
 
     }
 

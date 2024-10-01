@@ -20,10 +20,11 @@ import Id from '@salesforce/user/Id';
 const columns = [
     { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
     { label: 'WBS', fieldName: 'WBS__c', editable: true, sortable: true },
-    { label: 'Status', fieldName: 'Status__c', editable: true },
+    { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean', initialWidth: '55px' },
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
     { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
-    { label: 'Delta', fieldName: 'Delta__c', editable: true }
+    { label: 'Delta', fieldName: 'Delta__c', editable: true },
+    { label: 'Assigned', fieldName: 'Assigned_To__c', editable: true }
 ];
 
 const actions = [
