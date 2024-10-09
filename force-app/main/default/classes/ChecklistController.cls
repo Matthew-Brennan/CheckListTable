@@ -6,26 +6,24 @@ public with sharing class ChecklistController {
     public static List<Checklist_Item__c> getChecklistItems(String recordId) {
         try {
             //if its not a case object, as cases always start with 500
-            if (!recordId.startsWith('500'))
-            {
-            // Query checklist items related to the provided record ID and order them by WBS__c field
-            return [SELECT Id, Name, Status__c, Budgeted_Time__c, Actual_Hours__c, WBS__c, Delta__c
-                    FROM Checklist_Item__c
-                    WHERE Checklist__r.Id = :recordId
-                    ORDER BY WBS__c ASC];
-            }
-            
-            else
-            {
-                // Query all checklist items and order them by WBS__c field
+            if (!recordId.startsWith('500')) {
+                // For non-Case records
+                return [SELECT Id, Name, Status__c, Budgeted_Time__c, Actual_Hours__c, WBS__c, Delta__c, 
+                        Assigned_To__c, Assigned_To__r.Name, Assigned_To__r.SmallPhotoUrl
+                        FROM Checklist_Item__c
+                        WHERE Checklist__r.Id = :recordId
+                        ORDER BY WBS__c ASC];
+            } else {
+                // For Case records
                 Case chklst = [SELECT Id, Checklist__r.Id
-                    FROM Case
-                    WHERE Id = :recordId];
+                               FROM Case
+                               WHERE Id = :recordId];
 
-                return [SELECT Id, Name, Status__c, Budgeted_Time__c, Actual_Hours__c, WBS__c, Delta__c
-                FROM Checklist_Item__c
-                WHERE Checklist__r.Id = :chklst.Checklist__r.Id
-                ORDER BY WBS__c ASC];
+                return [SELECT Id, Name, Status__c, Budgeted_Time__c, Actual_Hours__c, WBS__c, Delta__c, 
+                        Assigned_To__c, Assigned_To__r.Name, Assigned_To__r.SmallPhotoUrl
+                        FROM Checklist_Item__c
+                        WHERE Checklist__r.Id = :chklst.Checklist__r.Id
+                        ORDER BY WBS__c ASC];
             }
         } catch (Exception e) {
             // Handle any exceptions and throw a user-friendly error message

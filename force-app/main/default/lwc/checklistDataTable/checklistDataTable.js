@@ -23,8 +23,17 @@ const columns = [
     { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean', initialWidth: '55px' },
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
     { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
-    { label: 'Delta', fieldName: 'Delta__c', editable: true },
-    { label: 'Assigned', fieldName: 'Assigned_To__c', editable: true }
+    { label: 'Delta', fieldName: 'Delta__c', editable: true, initialWidth: '55px' },
+    { 
+        label: 'Assigned To', 
+        fieldName: 'Assigned_To__c', 
+        type: 'customLookup',
+        typeAttributes: {
+            placeholder: 'Choose User',
+            uniqueId: { fieldName: 'Id' }
+        },
+        editable: true
+    }
 ];
 
 const actions = [
@@ -57,12 +66,26 @@ export default class ChecklistDataTable extends LightningElement {
         //console.log(this.recordId.substring(0,3));
         this.wiredCheckListResult = result;
         if (result.data) {
-            this.checkList = result.data;
+            this.checkList = result.data.map(item => ({
+                ...item,
+                Assigned_To__c: item.Assigned_To__c ? {
+                    Id: item.Assigned_To__c,
+                    Name: item.Assigned_To__r ? item.Assigned_To__r.Name : '',
+                    SmallPhotoUrl: item.Assigned_To__r ? item.Assigned_To__r.SmallPhotoUrl : ''
+                } : null
+            }));
             this.error = undefined;
         } else if (result.error) {
             this.error = result.error;
             this.checkList = [];
         }
+    }
+
+    handleLookupClick(event) {
+        const uniqueId = event.detail.uniqueId;
+        // Here you would typically open a modal or navigate to a user selection page
+        console.log(`Lookup clicked for row with ID: ${uniqueId}`);
+        // For now, we'll just log the event. You'll need to implement the actual user selection logic.
     }
 
     //Function to handle inserting a new blank task
@@ -105,7 +128,17 @@ export default class ChecklistDataTable extends LightningElement {
 
     //function to handle saving changes
     async handleSave(event) {
-        const updatedFields = event.detail.draftValues;
+        const updatedFields = event.detail.draftValues.map(draftValue => {
+            const field = {};
+            Object.keys(draftValue).forEach(key => {
+                if (key === 'Assigned_To__c') {
+                    field[key] = draftValue[key].Id;
+                } else {
+                    field[key] = draftValue[key];
+                }
+            });
+            return field;
+        });
 
         // Prepare the record IDs for notifyRecordUpdateAvailable()
         const notifyChangeIds = updatedFields.map(row => { return { "recordId": row.Id } });
