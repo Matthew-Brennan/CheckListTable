@@ -24,16 +24,6 @@ const columns = [
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
     { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
     { label: 'Delta', fieldName: 'Delta__c', editable: true, initialWidth: '55px' },
-    { 
-        label: 'Assigned To', 
-        fieldName: 'Assigned_To__c', 
-        type: 'customLookup',
-        typeAttributes: {
-            placeholder: 'Choose User',
-            uniqueId: { fieldName: 'Id' }
-        },
-        editable: true
-    }
 ];
 
 const actions = [
