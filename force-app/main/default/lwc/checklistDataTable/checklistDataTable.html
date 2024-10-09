@@ -43,14 +43,16 @@
         <!-- Data Table -->
         <template if:true={checkList}>
             <lightning-datatable
+                class="custom-datatable"
                 max-row-select ='1'
                 key-field="Id"
-                data={checkList}
+                data={paginatedCheckList}
                 columns={columns}
                 draft-values={draftValues}
                 hide-checkbox-column={hideCheckboxColumn}
                 show-row-number-column={showRowNumberColumn}
                 onrowselection={handleRowSelection}
+                onrowaction={handleRowAction}
                 sorted-by={sortBy}
                 sorted-direction={sortDirection}
                 onsort={handleSorting}
@@ -60,6 +62,23 @@
         <template if:true={error}>
             <p class="slds-text-color_error">Error fetching checklist items</p>
         </template>
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+            <lightning-button 
+                label="Previous" 
+                onclick={previousPage}
+                disabled={disablePrevious}
+                class="slds-m-right_small"
+            ></lightning-button>
+            <p>Page {pageNumber} of {totalPages}</p>
+            <lightning-button 
+                label="Next" 
+                onclick={nextPage}
+                disabled={disableNext}
+                class="slds-m-left_small"
+            ></lightning-button>
+        </div>
+
 
         <!-- Modal Logic for Data Loader -->
         <template if:true={isModalOpen}>

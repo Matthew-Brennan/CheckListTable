@@ -15,10 +15,24 @@ import csvModal from 'c/checkListDataLoader'
 import timeEntryModal from 'c/checkListTimeEntry'
 import signaturePad from 'c/nameAndSignatureCapture'
 import Id from '@salesforce/user/Id';
+import { NavigationMixin } from 'lightning/navigation';
+import './checklistDataTable.css';
 
 
 const columns = [
-    { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
+    { 
+        label: 'Task', 
+        fieldName: 'Name', 
+        type: 'button',
+        typeAttributes: {
+            label: { fieldName: 'Name' },
+            title: 'Click to view details',
+            name: 'view_details',
+            variant: 'base'
+        },
+        editable: true, 
+        sortable: true 
+    },
     { label: 'WBS', fieldName: 'WBS__c', editable: true, sortable: true },
     { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean', initialWidth: '55px' },
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
@@ -30,9 +44,9 @@ const actions = [
     { label: 'New Task', name: 'new' },
 ];
 
+const PAGE_SIZE = 10;
 
-
-export default class ChecklistDataTable extends LightningElement {
+export default class ChecklistDataTable extends NavigationMixin(LightningElement) {
     @track checkList = [];
     columns = columns;
     @api recordId;
@@ -49,11 +63,15 @@ export default class ChecklistDataTable extends LightningElement {
 
     // Need to set these values here idk why
     hideCheckboxColumn = false;
-    showRowNumberColumn = false;  
+    showRowNumberColumn = false;
+
+    // Pagination variables
+    @track pageNumber = 1;
+    @track totalPages = 0;
+    pageSize = PAGE_SIZE;
     
     @wire(getCheckListItems, { recordId: '$recordId' })
     wiredCheckList(result) {
-        //console.log(this.recordId.substring(0,3));
         this.wiredCheckListResult = result;
         if (result.data) {
             this.checkList = result.data.map(item => ({
@@ -64,11 +82,65 @@ export default class ChecklistDataTable extends LightningElement {
                     SmallPhotoUrl: item.Assigned_To__r ? item.Assigned_To__r.SmallPhotoUrl : ''
                 } : null
             }));
+            this.totalPages = Math.ceil(this.checkList.length / this.pageSize);
+            this.paginateData();
             this.error = undefined;
         } else if (result.error) {
             this.error = result.error;
             this.checkList = [];
+            this.paginatedCheckList = [];
         }
+    }
+
+    paginateData() {
+        const start = (this.pageNumber - 1) * this.pageSize;
+        const end = this.pageNumber * this.pageSize;
+        this.paginatedCheckList = this.checkList.slice(start, end);
+    }
+
+    previousPage() {
+        if (this.pageNumber > 1) {
+            this.pageNumber = this.pageNumber - 1;
+            this.paginateData();
+        }
+    }
+
+    nextPage() {
+        if (this.pageNumber < this.totalPages) {
+            this.pageNumber = this.pageNumber + 1;
+            this.paginateData();
+        }
+    }
+
+    get disablePrevious() {
+        return this.pageNumber <= 1;
+    }
+
+    get disableNext() {
+        return this.pageNumber >= this.totalPages;
+    }
+
+    handleRowAction(event) {
+        const action = event.detail.action;
+        const row = event.detail.row;
+        switch (action.name) {
+            case 'view_details':
+                this.navigateToRecordPage(row.Id);
+                break;
+            default:
+                break;
+        }
+    }
+
+    navigateToRecordPage(recordId) {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: recordId,
+                objectApiName: 'Checklist_Item__c',
+                actionName: 'view'
+            }
+        });
     }
 
     handleLookupClick(event) {
@@ -103,6 +175,8 @@ export default class ChecklistDataTable extends LightningElement {
                     })
                 );
             }
+            this.totalPages = Math.ceil(this.checkList.length / this.pageSize);
+            this.paginateData();
             
         } catch(error) {
             this.dispatchEvent(
@@ -129,39 +203,45 @@ export default class ChecklistDataTable extends LightningElement {
             });
             return field;
         });
-
+    
         // Prepare the record IDs for notifyRecordUpdateAvailable()
         const notifyChangeIds = updatedFields.map(row => { return { "recordId": row.Id } });
-
+    
         try {
             // Pass edited fields to the updateTasks Apex controller
             const result = await updateTasks({ data: updatedFields });
             console.log(JSON.stringify("Apex update result: " + result));
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Success',
-                    message: 'Checklist items updated',
-                    variant: 'success'
-                })
-            );
-
-            // Refresh LDS cache and wires
-            notifyRecordUpdateAvailable(notifyChangeIds);
-
-            // Display fresh data in the datatable
-            await refreshApex(this.wiredCheckListResult);
             
-            // Clear all draft values in the datatable
-            this.draftValues = [];
+            if (result === 'Success: tasks updated successfully') {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: 'Checklist items updated',
+                        variant: 'success'
+                    })
+                );
+    
+                // Refresh LDS cache and wires
+                notifyRecordUpdateAvailable(notifyChangeIds);
+    
+                // Display fresh data in the datatable
+                await refreshApex(this.wiredCheckListResult);
+                
+                // Clear all draft values in the datatable
+                this.draftValues = [];
+            } else {
+                throw new Error(result);
+            }
         } catch (error) {
             this.dispatchEvent(
                 new ShowToastEvent({
-                    title: 'Error updating or refreshing records',
-                    message: error.body.message,
+                    title: 'Error updating records',
+                    message: error.message || 'Unknown error occurred',
                     variant: 'error'
                 })
             );
         }
+        this.paginateData();
     }
 
     handleRowSelection(event) {

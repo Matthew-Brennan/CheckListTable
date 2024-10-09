@@ -1,0 +1,19 @@
+.custom-datatable {
+    --lwc-tableColorBackgroundHeader: var(--lwc-colorBackgroundAlt);
+}
+
+.custom-datatable::part(tbody) td {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.pagination-controls p {
+    margin: 0 1rem;
+}
