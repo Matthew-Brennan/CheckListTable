@@ -9,6 +9,16 @@ import updateCLI from '@salesforce/apex/checklistTimeEntryController.updateCheck
 //import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
 export default class CheckListTimeEntry extends LightningModal {
 
+    //TODO: actualHours either truncates the decimal or is acting as an integer
+    //TODO: update dataloader to match the new layout
+    //TODO: Dataloader add field notes
+    //TODO: flip the delta sign 
+    //TODO: button for new checklist
+    //TODO: linking Checklist items into orginal Time Reporting methods
+    //TODO: if not a project WBS must be blank
+
+    // clean up html in time entry
+
     @api caseId;       // Expose case record ID to the component to receive data from the parent component
     @api checklistId;   // Expose checklist record ID to the component to receive data from the parent component
     @api selectedRowID ;//
@@ -17,8 +27,8 @@ export default class CheckListTimeEntry extends LightningModal {
     theUser = '';
     Tos = '';
     wbsNum = '';
-    hoursWorked = 0;
-    otHours = 0;
+    hoursWorked = 0.00;
+    otHours = 0.00;
     chargeOutPos = '';
     chargeOutRate = '';
     billingCompany = '';
@@ -75,7 +85,7 @@ export default class CheckListTimeEntry extends LightningModal {
     
     async handleSubmit() {
         const rowId = this.selectedRowID.toString(); // set the rowId for the Checklist item being updated to a string
-        const totalTime = parseFloat(this.hoursWorked) + parseFloat(this.otHours); // add the two values of OT hours and regular hours as a decimal
+        const totalTime = this.hoursWorked + this.otHours; // add the two values of OT hours and regular hours as a decimal
 
         await updateCLI({cliId: rowId, totalHours: totalTime,});
         this.timeEntry = [];

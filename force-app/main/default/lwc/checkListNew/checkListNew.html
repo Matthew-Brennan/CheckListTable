@@ -1,0 +1,32 @@
+<template>
+    <lightning-modal-header title="New Checklist" label="New Checklist"></lightning-modal-header>
+
+    <lightning-modal-body>
+        
+        <!-- Case Related List Selector -->
+        
+        <lightning-record-edit-form object-api-name="Checklist__c" onsuccess={handleNewChecklist}>
+            <lightning-messages> </lightning-messages>
+        <!-- Time Reporting Input Fields -->
+
+            <!-- User Related List Selector -->
+            <lightning-input-field  field-name="User__c" value={theUser}></lightning-input-field>
+            <lightning-input-field field-name="Name"> </lightning-input-field>
+            <!--Call Signature LWC-->
+            <lightning-card >
+                <c-name-and-signature-capture record-id={timeID}></c-name-and-signature-capture>
+            </lightning-card>
+
+            
+            <lightning-button
+            class="slds-m-top_small"
+            type="submit"
+            label="Create Time Report"
+            onclick={handleSubmit}
+            >
+            </lightning-button>
+    
+        </lightning-record-edit-form>
+    
+    </lightning-modal-body>
+</template>

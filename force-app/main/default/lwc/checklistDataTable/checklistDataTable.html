@@ -40,6 +40,13 @@
             onclick={handleTimeOpen}
         ></lightning-button>
 
+        <!-- Data Loader Button -->
+        <lightning-button 
+            variant="brand" 
+            label="New Checklist" 
+            onclick={handleNewChecklist}
+        ></lightning-button>
+
         <!-- Data Table -->
         <template if:true={checkList}>
             <lightning-datatable

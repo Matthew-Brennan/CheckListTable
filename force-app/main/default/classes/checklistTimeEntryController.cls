@@ -25,9 +25,13 @@ public with sharing class checklistTimeEntryController {
             Checklist_Item__c chklstRecord = [SELECT Id, Name, Actual_Hours__c, WBS__c
                                               FROM Checklist_Item__c
                                               WHERE Id = :cliId LIMIT 1];
+
+            System.debug('Total Hours: ' + totalHours);
+            System.debug('Actual Hours: ' + chklstRecord.Actual_Hours__c );
     
             // Update the Actual_Hours__c field
             chklstRecord.Actual_Hours__c += totalHours;
+            System.debug('Post Addition Hours: ' + chklstRecord.Actual_Hours__c );
             
             // Perform the update
             update chklstRecord;

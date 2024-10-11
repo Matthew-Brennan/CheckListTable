@@ -20,24 +20,12 @@ import './checklistDataTable.css';
 
 
 const columns = [
-    { 
-        label: 'Task', 
-        fieldName: 'Name', 
-        type: 'button',
-        typeAttributes: {
-            label: { fieldName: 'Name' },
-            title: 'Click to view details',
-            name: 'view_details',
-            variant: 'base'
-        },
-        editable: true, 
-        sortable: true 
-    },
+    { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
     { label: 'WBS', fieldName: 'WBS__c', editable: true, sortable: true },
     { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean', initialWidth: '55px' },
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
     { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
-    { label: 'Delta', fieldName: 'Delta__c', editable: true, initialWidth: '55px' },
+    { label: 'Hours Overbudget', fieldName: 'Delta__c', editable: true, initialWidth: '55px' },
 ];
 
 const actions = [
