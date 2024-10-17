@@ -12,7 +12,7 @@ export default class CheckListTimeEntry extends LightningModal {
     //TODO: actualHours either truncates the decimal or is acting as an integer
     //TODO: update dataloader to match the new layout
     //TODO: Dataloader add field notes
-    //TODO: flip the delta sign 
+
     //TODO: button for new checklist
     //TODO: linking Checklist items into orginal Time Reporting methods
     //TODO: if not a project WBS must be blank

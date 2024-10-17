@@ -10,13 +10,15 @@ import getTOS from '@salesforce/apex/ChecklistController.getTOS';
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
+import { loadStyle } from 'lightning/platformResourceLoader';
 import LightningModal from 'lightning/modal';
 import csvModal from 'c/checkListDataLoader'
 import timeEntryModal from 'c/checkListTimeEntry'
+import newListModal from 'c/checkListNew'
 import signaturePad from 'c/nameAndSignatureCapture'
 import Id from '@salesforce/user/Id';
 import { NavigationMixin } from 'lightning/navigation';
-import './checklistDataTable.css';
+import tablesccs from '@salesforce/resourceUrl/checklistCSS'
 
 
 const columns = [
@@ -48,6 +50,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
 
     @track isModalOpen = false; // Track modal state
     @track toTimeEntry = false; // track time entry modal state
+    @track toNewList = false;   // track New List modal state
 
     // Need to set these values here idk why
     hideCheckboxColumn = false;
@@ -276,129 +279,164 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
         }
     }
 
-        // requery to refresh the data
-        refreshData() {
-            return refreshApex(this.wiredCheckListResult);
+    // requery to refresh the data
+    refreshData() {
+        return refreshApex(this.wiredCheckListResult);
+    }
+    //open the dataloader modal
+    async handleModalOpen() {
+        try {
+            const result = await csvModal.open({
+                label: 'Process CSV File',
+                size: 'medium',
+                description: 'Load your CSV file here',
+                component: 'c-check-list-data-loader',
+                recordId: this.passedChklistId,
+            });
+        if (result === 'saved') {
+            this.refreshData();
         }
-        //open the dataloader modal
-        async handleModalOpen() {
-            try {
-                const result = await csvModal.open({
-                    label: 'Process CSV File',
-                    size: 'medium',
-                    description: 'Load your CSV file here',
-                    component: 'c-check-list-data-loader',
-                    recordId: this.passedChklistId,
-                });
+        } catch {
+            console.log('Error opening modal:', error);
+        }
+    }
+
+    //open the Time Entry Modal
+    async handleTimeOpen() {
+        this.timeEntry = []
+        const usr = await getUser({userId: this.userId});
+        const cse = await getCase({caseId: this.recordId});
+        const tos = await getTOS({caseId: this.recordId});
+
+        this.timeEntry.push(this.recordId); //[0] Case
+        this.timeEntry.push(this.userId);   //[1] User
+        this.timeEntry.push(tos);           //[2] Type of Support
+
+        
+        
+        if (usr == 'L1'){
+            this.timeEntry.push('Jr. Technician Rate');     //[3] Charge Out Position
+            this.timeEntry.push('140');                     //[4] Charge Out Rage
+        }else{ 
+            this.timeEntry.push('Sr. Technician Rate');     //[3] Charge Out Position
+            this.timeEntry.push('160');                     //[4] Charge Out Rate
+        }
+            
+        //TODO fix the picklist values for this so it works because the TR and Case equvilant values arent teh same string
+            this.timeEntry.push('Eastbay Cloud Services Ltd.');   //[5] Billing Company
+
+            
+        if(this.chosenRows){
+
+            this.timeEntry.push(this.chosenRows[0].Name);              //[6] Description of work
+            this.chosenRows[0].WBS__c ? this.timeEntry.push(this.chosenRows[0].WBS__c.toString()) : this.timeEntry.push('0');            //[7] WBS if blank put 0
+        }   
+
+        try {
+            const result = await timeEntryModal.open({
+                label: 'Time Entry',
+                size: 'large',
+                description: 'Time Entry',
+                component: 'c-check-list-time-entry',
+                checklistId: this.passedChklistId,
+                caseId: this.recordId,
+                selectedRowID: this.selectedRowsID,
+                timeEntry: this.timeEntry,
+            });
             if (result === 'saved') {
                 this.refreshData();
             }
         } catch {
+            console.log('Error opening modal:'+ result.error);
+        }
+        this.timeEntry = [];
+    }
+
+    //open the dataloader modal
+    async handleNewChecklist() {
+        try {
+            const result = await newListModal.open({
+                label: 'Create New Checklist',
+                size: 'medium',
+                description: 'Create New Checklist',
+                component: 'c-check-list-new',
+                caseId: this.recordId,
+            });
+        if (result === 'saved') {
+            this.refreshData();
+        }
+        } catch {
             console.log('Error opening modal:', error);
         }
-        }
+    }
 
-        //open the Time Entry Modal
-        async handleTimeOpen() {
-            this.timeEntry = []
-            const usr = await getUser({userId: this.userId});
-            const cse = await getCase({caseId: this.recordId});
-            const tos = await getTOS({caseId: this.recordId});
+    //Close the modal
+    async handleModalClose() {
+        this.refreshData();
+        this.isModalOpen = false;
+    }
+    async handleTimeClose() {
+        this.refreshData();
+        this.toTimeEntry = false;
+        console.log(this.timeEntry);
+        this.timeEntry = [];
+        console.log(this.timeEntry);
+    }
 
-            this.timeEntry.push(this.recordId); //[0] Case
-            this.timeEntry.push(this.userId);   //[1] User
-            this.timeEntry.push(tos);           //[2] Type of Support
+    async handleModalClose() {
+        this.refreshData();
+        this.toNewList = false;
+    }
 
-            
-            
-            if (usr == 'L1'){
-                this.timeEntry.push('Jr. Technician Rate');     //[3] Charge Out Position
-                this.timeEntry.push('140');                     //[4] Charge Out Rage
-            }else{ 
-                this.timeEntry.push('Sr. Technician Rate');     //[3] Charge Out Position
-                this.timeEntry.push('160');                     //[4] Charge Out Rate
-            }
-             
-            //TODO fix the picklist values for this so it works because the TR and Case equvilant values arent teh same string
-             this.timeEntry.push('Eastbay Cloud Services Ltd.');   //[5] Billing Company
+    //save the info added by the modal probably wont use as the info should be added from the modal LWC itself
+    async handleModalSave() {
 
-             
-            if(this.chosenRows){
+        this.isModalOpen = false;
+    }
 
-                this.timeEntry.push(this.chosenRows[0].Name);              //[6] Description of work
-                this.chosenRows[0].WBS__c ? this.timeEntry.push(this.chosenRows[0].WBS__c.toString()) : this.timeEntry.push('0');            //[7] WBS if blank put 0
-            }   
+    async handleTimeSave() {
 
-            try {
-                const result = await timeEntryModal.open({
-                    label: 'Time Entry',
-                    size: 'large',
-                    description: 'Time Entry',
-                    component: 'c-check-list-time-entry',
-                    checklistId: this.passedChklistId,
-                    caseId: this.recordId,
-                    selectedRowID: this.selectedRowsID,
-                    timeEntry: this.timeEntry,
-                });
-                if (result === 'saved') {
-                    this.refreshData();
-                }
-            } catch {
-                console.log('Error opening modal:'+ result.error);
-            }
-            this.timeEntry = [];
-        }
+        this.toTimeEntry = false;
+    }
+
+    async handleNewSave() {
+
+        this.toNewList = false;
+    }
+
+    handleSorting(event) {
+        this.sortBy = event.detail.fieldName;
+        this.sortDirection = event.detail.sortDirection;
+        this.sortData(this.sortBy, this.sortDirection);
+    }
+
+    sortData(fieldname, direction) {
+        let parseData = JSON.parse(JSON.stringify(this.checkList));
+        // Return the value stored in the field
+        let keyValue = (a) => {
+            return a[fieldname];
+        };
+        // checking reverse direction
+        let isReverse = direction === 'asc' ? 1: -1;
+        // sorting data
+        parseData.sort((x, y) => {
+            x = keyValue(x) ? keyValue(x) : ''; // handling null values
+            y = keyValue(y) ? keyValue(y) : '';
+            // sorting values based on direction
+            return isReverse * ((x > y) - (y > x));
+        });
+        this.checkList = parseData;
+    }
+
+    //set the id thats used for uploading modal features to the id of the Checklist even if the component is not on the checklist
+        async renderedCallback() {
+            this.passedChklistId = await getTypeOfObj({recordId: this.recordId});
     
-        //Close the modal
-        async handleModalClose() {
-            this.refreshData();
-            this.isModalOpen = false;
-        }
-        async handleTimeClose() {
-            this.refreshData();
-            this.toTimeEntry = false;
-            console.log(this.timeEntry);
-            this.timeEntry = [];
-            console.log(this.timeEntry);
-        }
-    
-        //save the info added by the modal probably wont use as the info should be added from the modal LWC itself
-        async handleModalSave() {
+    }
 
-            this.isModalOpen = false;
-        }
+    connectedCallback(){
+        loadStyle(this, tablesccs);
+    }
 
-        async handleTimeSave() {
-
-            this.toTimeEntry = false;
-        }
-
-        handleSorting(event) {
-            this.sortBy = event.detail.fieldName;
-            this.sortDirection = event.detail.sortDirection;
-            this.sortData(this.sortBy, this.sortDirection);
-        }
-    
-        sortData(fieldname, direction) {
-            let parseData = JSON.parse(JSON.stringify(this.checkList));
-            // Return the value stored in the field
-            let keyValue = (a) => {
-                return a[fieldname];
-            };
-            // checking reverse direction
-            let isReverse = direction === 'asc' ? 1: -1;
-            // sorting data
-            parseData.sort((x, y) => {
-                x = keyValue(x) ? keyValue(x) : ''; // handling null values
-                y = keyValue(y) ? keyValue(y) : '';
-                // sorting values based on direction
-                return isReverse * ((x > y) - (y > x));
-            });
-            this.checkList = parseData;
-        }
-
-        //set the id thats used for uploading modal features to the id of the Checklist even if the component is not on the checklist
-         async renderedCallback() {
-             this.passedChklistId = await getTypeOfObj({recordId: this.recordId});
-     }
+     
 }

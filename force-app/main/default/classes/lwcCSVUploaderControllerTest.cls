@@ -47,6 +47,7 @@ public class lwcCSVUploaderControllerTest {
         String cdbId = testItem.Id; // ID of the Checklist__c record
         Decimal budgetedTime = 5.6;
         Decimal actualTime = 2.3;
+        Decimal wbs = 1.0;
         String taskName = 'Task NameTask NameTask Name...'; // Task name is excessively long
 
         // Start the test context

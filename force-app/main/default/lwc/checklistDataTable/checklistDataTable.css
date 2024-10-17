@@ -7,6 +7,11 @@
     padding-bottom: 0.25rem !important;
 }
 
+.newChecklistbtn{
+    background-color: blue !important;
+    justify-self: end !important;
+}
+
 .pagination-controls {
     display: flex;
     justify-content: center;

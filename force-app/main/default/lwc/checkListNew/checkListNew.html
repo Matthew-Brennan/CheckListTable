@@ -12,16 +12,11 @@
             <!-- User Related List Selector -->
             <lightning-input-field  field-name="User__c" value={theUser}></lightning-input-field>
             <lightning-input-field field-name="Name"> </lightning-input-field>
-            <!--Call Signature LWC-->
-            <lightning-card >
-                <c-name-and-signature-capture record-id={timeID}></c-name-and-signature-capture>
-            </lightning-card>
-
             
             <lightning-button
             class="slds-m-top_small"
             type="submit"
-            label="Create Time Report"
+            label="Create New Checklist"
             onclick={handleSubmit}
             >
             </lightning-button>

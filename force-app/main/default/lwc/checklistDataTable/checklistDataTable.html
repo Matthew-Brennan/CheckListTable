@@ -40,9 +40,10 @@
             onclick={handleTimeOpen}
         ></lightning-button>
 
-        <!-- Data Loader Button -->
-        <lightning-button 
-            variant="brand" 
+        <!-- New Checklist Button -->
+        <lightning-button if:false={checkListBool}
+            class="newChecklistbtn"
+            variant="Neutral" 
             label="New Checklist" 
             onclick={handleNewChecklist}
         ></lightning-button>
@@ -107,6 +108,14 @@
                 onclose={handleTimeClose} 
                 onsave={handleTimeSave}>
             </c-check-list-time-entry>
+        </template>
+            <!-- Modal Logic for New Checklist -->
+        <template if:true={toNewList}>
+            <c-check-list-new
+                case-id={recordId}
+                onclose={handleNewClose} 
+                onsave={handleNewSave}>
+            </c-check-list-new>
         </template>
     </lightning-card>
 </template>
