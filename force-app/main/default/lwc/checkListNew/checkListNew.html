@@ -2,26 +2,18 @@
     <lightning-modal-header title="New Checklist" label="New Checklist"></lightning-modal-header>
 
     <lightning-modal-body>
-        
-        <!-- Case Related List Selector -->
-        
-        <lightning-record-edit-form object-api-name="Checklist__c" onsuccess={handleNewChecklist}>
-            <lightning-messages> </lightning-messages>
-        <!-- Time Reporting Input Fields -->
+        <lightning-record-edit-form object-api-name="Checklist__c">
+            <lightning-messages></lightning-messages>
 
-            <!-- User Related List Selector -->
-            <lightning-input-field  field-name="User__c" value={theUser}></lightning-input-field>
-            <lightning-input-field field-name="Name"> </lightning-input-field>
+            <lightning-input-field field-name="User__c" value={theUser}></lightning-input-field>
+            <lightning-input-field field-name="Name" onchange={handleName}></lightning-input-field>
             
             <lightning-button
-            class="slds-m-top_small"
-            type="submit"
-            label="Create New Checklist"
-            onclick={handleSubmit}
-            >
-            </lightning-button>
-    
+                class="slds-m-top_small"
+                type="submit"
+                label="Create New Checklist"
+                onclick={handleSubmit}
+            ></lightning-button>
         </lightning-record-edit-form>
-    
     </lightning-modal-body>
 </template>

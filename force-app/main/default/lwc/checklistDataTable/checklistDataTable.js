@@ -1,5 +1,6 @@
 import { LightningElement, wire, api, track } from 'lwc';
 import getCheckListItems from '@salesforce/apex/ChecklistController.getChecklistItems';
+import hasChecklist from '@salesforce/apex/ChecklistController.hasChecklist';
 import updateTasks from "@salesforce/apex/ChecklistController.updateTasks";
 import createNewTask from "@salesforce/apex/ChecklistController.newTask";
 import deleteTasks from "@salesforce/apex/ChecklistController.deleteTasks";
@@ -47,6 +48,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
     chosenRows
     timeEntry = [];
     TimeEntryBool =  false;
+    checkListBool = false;
 
     @track isModalOpen = false; // Track modal state
     @track toTimeEntry = false; // track time entry modal state
@@ -61,6 +63,23 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
     @track totalPages = 0;
     pageSize = PAGE_SIZE;
     
+
+    @wire(hasChecklist, { recordId: '$recordId' })
+    wiredCase(result){
+        console.log(result);
+        console.log(result.data);
+        if(result.data){
+            this.checkListBool = result.data;
+        }else if (result.error) {
+            this.error = result.error;
+            console.log(this.error);
+        }
+        console.log(this.checkListBool);
+        
+    }
+
+
+
     @wire(getCheckListItems, { recordId: '$recordId' })
     wiredCheckList(result) {
         this.wiredCheckListResult = result;
@@ -132,6 +151,16 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
                 actionName: 'view'
             }
         });
+    }
+
+    showToast(title, message, variant) {
+        const event = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,    // 'success', 'error', 'warning', 'info'
+            mode: 'dismissable'  // 'dismissable', 'pester', 'sticky'
+        });
+        this.dispatchEvent(event);
     }
 
     handleLookupClick(event) {
@@ -362,17 +391,31 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
                 component: 'c-check-list-new',
                 caseId: this.recordId,
             });
-        if (result === 'saved') {
+        if (result === 'success') {
+            // Success toast
+            this.showToast(
+                'Success',
+                'Checklist created successfully',
+                'success'
+            );
+            await this.handleChecklistClose();
             this.refreshData();
         }
-        } catch {
-            console.log('Error opening modal:', error);
+        } catch (error){
+            console.log('Error opening modal:');
+            // Error toast
+            this.showToast(
+                'Error',
+                error.body?.message || 'Error creating checklist',
+                'error'
+            );
         }
     }
 
     //Close the modal
     async handleModalClose() {
         this.refreshData();
+        await refreshApex(this.records);
         this.isModalOpen = false;
     }
     async handleTimeClose() {
@@ -383,7 +426,8 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
         console.log(this.timeEntry);
     }
 
-    async handleModalClose() {
+    async handleChecklistClose() {
+        await refreshApex(this.recordId);
         this.refreshData();
         this.toNewList = false;
     }

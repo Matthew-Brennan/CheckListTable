@@ -32,6 +32,26 @@ public with sharing class ChecklistController {
     }
 
     @AuraEnabled(cacheable=true)  // Enables this method to be called from Aura or LWC and caches the results
+    public static Boolean hasChecklist(String recordId) {
+        try {
+        // For Case records
+        Case chklst = [SELECT Id, Checklist__r.Id
+                        FROM Case
+                        WHERE Id = :recordId];
+
+        if(chklst.Checklist__r.Id != null){
+            return true;
+        }else{
+            return false;
+        }
+
+        } catch (Exception e) {
+            // Handle any exceptions and throw a user-friendly error message
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    @AuraEnabled(cacheable=true)  // Enables this method to be called from Aura or LWC and caches the results
     public static String getTypeOfObject(String recordId) {
         try {
             //if its not a case object, as cases always start with 500
