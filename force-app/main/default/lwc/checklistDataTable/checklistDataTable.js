@@ -66,15 +66,12 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
 
     @wire(hasChecklist, { recordId: '$recordId' })
     wiredCase(result){
-        console.log(result);
-        console.log(result.data);
         if(result.data){
             this.checkListBool = result.data;
         }else if (result.error) {
             this.error = result.error;
-            console.log(this.error);
+
         }
-        console.log(this.checkListBool);
         
     }
 
@@ -166,7 +163,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
     handleLookupClick(event) {
         const uniqueId = event.detail.uniqueId;
         // Here you would typically open a modal or navigate to a user selection page
-        console.log(`Lookup clicked for row with ID: ${uniqueId}`);
+        //console.log(`Lookup clicked for row with ID: ${uniqueId}`);
         // For now, we'll just log the event. You'll need to implement the actual user selection logic.
     }
 

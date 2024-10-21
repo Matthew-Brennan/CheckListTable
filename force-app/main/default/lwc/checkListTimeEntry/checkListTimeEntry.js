@@ -13,11 +13,9 @@ export default class CheckListTimeEntry extends LightningModal {
     //TODO: update dataloader to match the new layout
     //TODO: Dataloader add field notes
 
-    //TODO: button for new checklist
     //TODO: linking Checklist items into orginal Time Reporting methods
     //TODO: if not a project WBS must be blank
 
-    // clean up html in time entry
 
     @api caseId;       // Expose case record ID to the component to receive data from the parent component
     @api checklistId;   // Expose checklist record ID to the component to receive data from the parent component
@@ -52,7 +50,7 @@ export default class CheckListTimeEntry extends LightningModal {
                 this.billingCompany = this.timeEntry[5];
                 this.descOfWork  = this.timeEntry[6];
                 this.wbsNum = this.timeEntry[7];
-                //this.hoursWorked = this.timeEntry[8];                
+                //this.hoursWorked = this.timeEntry[8];   Removed because time entry hours works is unique, kept like to show in index of hours worked             
             }
         }catch (error){
             console.log("ERROR: "+ error);
@@ -75,11 +73,12 @@ export default class CheckListTimeEntry extends LightningModal {
     } 
 
     handleHW(event){
-        this.hoursWorked = event.detail.value[0];
+        this.hoursWorked = event.detail.value;
+        console.log(this.hoursWorked);
     }
 
     handleOT(event){
-        this.otHours = event.detail.value[0];
+        this.otHours = event.detail.value;
         this.otHours *= 1.5
     }
     
