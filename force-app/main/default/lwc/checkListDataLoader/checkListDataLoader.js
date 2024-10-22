@@ -70,7 +70,6 @@ export default class CheckListDataLoader extends LightningModal {
     // Closes the modal window
     handleClose() {
         this.close(); // Close the modal
-        console.log('closed');
         return 'saved'; // Return 'saved' as a confirmation
     }
 
@@ -85,6 +84,7 @@ export default class CheckListDataLoader extends LightningModal {
         let parsedArray = lines.map(line => this.parseCSVLine(line)); // Parse each line of the CSV
 
         parsedArray.shift(); // Remove the header row
+        parsedArray.pop(); // Remove the totals
         parsedArray.pop(); // Remove any trailing empty line
 
         // Try to insert each parsed CSV line into the database

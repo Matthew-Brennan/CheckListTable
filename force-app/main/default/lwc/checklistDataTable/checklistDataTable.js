@@ -29,6 +29,7 @@ const columns = [
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
     { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
     { label: 'Hours Overbudget', fieldName: 'Delta__c', editable: true },
+    { label: 'Notes', fieldName: 'Notes__c', editable: true },
 ];
 
 const actions = [

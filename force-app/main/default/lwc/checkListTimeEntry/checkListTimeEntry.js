@@ -9,17 +9,13 @@ import updateCLI from '@salesforce/apex/checklistTimeEntryController.updateCheck
 //import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
 export default class CheckListTimeEntry extends LightningModal {
 
-
-    //TODO: update dataloader to match the new layout
-    //TODO: Dataloader add field notes
-
     //TODO: linking Checklist items into orginal Time Reporting methods
     //TODO: if not a project WBS must be blank
 
 
-    @api caseId;       // Expose case record ID to the component to receive data from the parent component
-    @api checklistId;   // Expose checklist record ID to the component to receive data from the parent component
-    @api selectedRowID ;//
+    @api caseId;         // Expose case record ID to the component to receive data from the parent component
+    @api checklistId;    // Expose checklist record ID to the component to receive data from the parent component
+    @api selectedRowID ; //
     @api timeEntry;
     theCase = '';
     theUser = '';
