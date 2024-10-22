@@ -92,10 +92,11 @@ export default class CheckListDataLoader extends LightningModal {
             parsedArray.forEach(element => {
                 insertLine({
                     wbsNum: parseFloat(element[0]), // Extract WBS number
-                    budgetedTime: parseFloat(element[3]), // Extract budgeted time
-                    actualTime: parseFloat(element[4]), // Extract actual time
+                    budgetedTime: parseFloat(element[4]), // Extract budgeted time
+                    actualTime: 0.00, // Extract actual time
                     taskName: element[1], // Extract task name
-                    cdbId: this.recordId // Use recordId from parent component
+                    cdbId: this.recordId, // Use recordId from parent component
+                    notes: element[5] // extract notes
                 })
                 .then(result => {
                     // Handle the result from the Apex method

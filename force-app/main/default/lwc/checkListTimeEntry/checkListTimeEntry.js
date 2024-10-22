@@ -9,7 +9,7 @@ import updateCLI from '@salesforce/apex/checklistTimeEntryController.updateCheck
 //import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
 export default class CheckListTimeEntry extends LightningModal {
 
-    //TODO: actualHours either truncates the decimal or is acting as an integer
+
     //TODO: update dataloader to match the new layout
     //TODO: Dataloader add field notes
 
@@ -41,7 +41,6 @@ export default class CheckListTimeEntry extends LightningModal {
     getCLI(result){ 
         try{
             if(result){
-                // console.log(result);
                 this.theCase = this.timeEntry[0];
                 this.theUser = this.timeEntry[1];
                 this.Tos = this.timeEntry[2];

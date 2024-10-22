@@ -25,10 +25,10 @@ import tablesccs from '@salesforce/resourceUrl/checklistCSS'
 const columns = [
     { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
     { label: 'WBS', fieldName: 'WBS__c', editable: true, sortable: true },
-    { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean', initialWidth: '55px' },
+    { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean' },
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
     { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
-    { label: 'Hours Overbudget', fieldName: 'Delta__c', editable: true, initialWidth: '55px' },
+    { label: 'Hours Overbudget', fieldName: 'Delta__c', editable: true },
 ];
 
 const actions = [
