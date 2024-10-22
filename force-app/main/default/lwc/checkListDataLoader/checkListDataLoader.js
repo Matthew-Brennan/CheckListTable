@@ -90,8 +90,9 @@ export default class CheckListDataLoader extends LightningModal {
         // Try to insert each parsed CSV line into the database
         try {
             parsedArray.forEach(element => {
+                console.log(element[0]);
                 insertLine({
-                    wbsNum: parseFloat(element[0]), // Extract WBS number
+                    wbsNum: element[0], // Extract WBS number
                     budgetedTime: parseFloat(element[4]), // Extract budgeted time
                     actualTime: 0.00, // Extract actual time
                     taskName: element[1], // Extract task name

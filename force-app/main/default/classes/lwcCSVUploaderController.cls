@@ -9,7 +9,7 @@ public class lwcCSVUploaderController {
     * - cdbId: The ID of the related Checklist__c record
     ***********************************************************************/
     @AuraEnabled
-    public static Checklist_Item__c insertNewElement(Decimal wbsNum, Decimal budgetedTime, Decimal actualTime, String taskName, String cdbId, String notes) {
+    public static Checklist_Item__c insertNewElement(String wbsNum, Decimal budgetedTime, Decimal actualTime, String taskName, String cdbId, String notes) {
 
         try { 
             // Create a new Checklist_Item__c record
