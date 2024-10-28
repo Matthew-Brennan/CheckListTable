@@ -70,6 +70,14 @@
         <template if:true={error}>
             <p class="slds-text-color_error">Error fetching checklist items</p>
         </template>
+
+        <!-- Time Entries Button -->
+        <lightning-button if:true={TimeEntryBool}
+            variant="Success" 
+            label="Time Entries" 
+            onclick={handleTimeOpen}
+        ></lightning-button>
+        
         <!-- Pagination Controls -->
         <div class="pagination-controls">
             <lightning-button 

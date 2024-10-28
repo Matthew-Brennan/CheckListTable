@@ -66,7 +66,7 @@ public with sharing class checklistTimeEntryControllerTest {
         item2.Name = 'returned Item';
         item2.Status__c = true;
         item2.WBS__c = '1.0';
-        item2.Actual_Hours__c = 0;
+        item2.Actual_Hours__c = 0.5;
         item2.Checklist__c = testList.Id;
         insert item2;
 
