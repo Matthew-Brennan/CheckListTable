@@ -23,12 +23,12 @@ import tablesccs from '@salesforce/resourceUrl/checklistCSS'
 
 
 const columns = [
-    { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
     { label: 'WBS', fieldName: 'WBS__c', editable: true, sortable: true },
-    { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean' },
+    { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
     { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
     { label: 'Hours Overbudget', fieldName: 'Delta__c', editable: true },
+    { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean' },
     { label: 'Notes', fieldName: 'Notes__c', editable: true },
 ];
 
@@ -374,7 +374,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
                 this.refreshData();
             }
         } catch {
-            console.log('Error opening modal:'+ result.error);
+            console.log('Error opening modal:');
         }
         this.timeEntry = [];
     }

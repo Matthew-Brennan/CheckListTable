@@ -79,7 +79,9 @@ export default class CheckListTimeEntry extends LightningModal {
     
     async handleSubmit() {
         const rowId = this.selectedRowID.toString(); // set the rowId for the Checklist item being updated to a string
-        const totalTime = this.hoursWorked + this.otHours; // add the two values of OT hours and regular hours as a decimal
+        const totalTime = parseFloat(this.hoursWorked) + parseFloat(this.otHours); // add the two values of OT hours and regular hours as a decimal
+
+        console.log(totalTime);
 
         await updateCLI({cliId: rowId, totalHours: totalTime,});
         this.timeEntry = [];

@@ -151,40 +151,50 @@ private class ChecklistControllerTest {
 
     @isTest
     static void testGetUser() {
-        // Create and insert a test Role record
-        UserRole testRole = new UserRole();
-        testRole.Name = 'Test Role';
-        insert testRole;
-
-        // Create and insert a test User record
-        User testUser = new User();
-        testUser.FirstName = 'Test22';
-        testUser.LastName = 'User22';
-        testUser.UserRoleId = testRole.Id;
-        testUser.Username='test22@test.ca'; 
-        testUser.Email='test@test.ca'; 
-        testUser.Alias='test';
-        testUser.TimeZoneSidKey='America/New_York'; 
-        testUser.LocaleSidKey='en_CA';
-        testUser.EmailEncodingKey='UTF-8';
-        testUser.ProfileId='00e32000001NtC9AAK';
-        testUser.LanguageLocaleKey='en_US';
-        insert testUser;
-
-        // Start the test context to measure the execution of the code
-        Test.startTest();
-        // Call the newTask method from ChecklistController with the test Checklist ID
-        ChecklistController.getUserInfo(testUser.Id);
-        try{
-            ChecklistController.getUserInfo(null);  //returns error 
-        }catch (AuraHandledException ex){
-            System.assertEquals('Script-thrown exception', ex.getMessage());
-        }
-        Test.stopTest();  // End the test context
+        // Get a standard profile instead of using hardcoded ID
+        Profile p = [SELECT Id FROM Profile WHERE Name = 'Standard User'];
         
-        // You can add assertions here to verify the expected outcome of the result
+        // Create test role
+        UserRole testRole = new UserRole(
+            DeveloperName = 'TestRole',
+            Name = 'Test Role'
+        );
+        insert testRole;
+    
+        // Create test user with the profile
+        User testUser = new User(
+            FirstName = 'Test22',
+            LastName = 'User22',
+            UserRoleId = testRole.Id,
+            Username = 'test22' + DateTime.now().getTime() + '@test.ca', // Make unique
+            Email = 'test@test.ca',
+            Alias = 'test',
+            TimeZoneSidKey = 'America/New_York',
+            LocaleSidKey = 'en_CA',
+            EmailEncodingKey = 'UTF-8',
+            ProfileId = p.Id,
+            LanguageLocaleKey = 'en_US'
+        );
+        insert testUser;
+    
+        System.runAs(testUser) {
+            Test.startTest();
+            
+            // Test valid user ID scenario
+            String result = ChecklistController.getUserInfo(testUser.Id);
+            System.assertNotEquals(null, result, 'User info should not be null');
+            
+            // Test null user ID scenario
+            try {
+                ChecklistController.getUserInfo(null);
+                System.assert(false, 'Expected exception was not thrown');
+            } catch (AuraHandledException ex) {
+                System.assertEquals('Script-thrown exception', ex.getMessage());
+            }
+            
+            Test.stopTest();
+        }
     }
-
     @isTest
     static void testUpdateTasksSuccess() {
 
