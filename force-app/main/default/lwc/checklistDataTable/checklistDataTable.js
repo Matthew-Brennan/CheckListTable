@@ -26,8 +26,8 @@ const columns = [
     { label: 'WBS', fieldName: 'WBS__c', editable: true, sortable: true },
     { label: 'Task', fieldName: 'Name', editable: true, sortable: true },
     { label: 'Budgeted Time', fieldName: 'Budgeted_Time__c', editable: true },
-    { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: true },
-    { label: 'Hours Overbudget', fieldName: 'Delta__c', editable: true },
+    { label: 'Actual Hours', fieldName: 'Actual_Hours__c', editable: false },
+    { label: 'Hours Overbudget', fieldName: 'Delta__c', editable: false },
     { label: 'Completed', fieldName: 'Status__c', editable: true, type: 'boolean' },
     { label: 'Notes', fieldName: 'Notes__c', editable: true },
 ];
@@ -161,20 +161,10 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
         this.dispatchEvent(event);
     }
 
-    handleLookupClick(event) {
-        const uniqueId = event.detail.uniqueId;
-        // Here you would typically open a modal or navigate to a user selection page
-        //console.log(`Lookup clicked for row with ID: ${uniqueId}`);
-        // For now, we'll just log the event. You'll need to implement the actual user selection logic.
-    }
-
     //Function to handle inserting a new blank task
     async handleNewTask() {
         try {
             const result = await createNewTask({ recordId: this.recordId });
-            
-            console.log("Apex insert result: ", result);
-            console.log("TYPE: " + typeof result)
             if(typeof result == 'object'){
                 this.dispatchEvent(
                     new ShowToastEvent({
@@ -330,58 +320,53 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
 
     //open the Time Entry Modal
     async handleTimeOpen() {
-        this.timeEntry = []
-        const usr = await getUser({userId: this.userId});
-        const cse = await getCase({caseId: this.recordId});
-        const tos = await getTOS({caseId: this.recordId});
-
-        this.timeEntry.push(this.recordId); //[0] Case
-        this.timeEntry.push(this.userId);   //[1] User
-        this.timeEntry.push(tos);           //[2] Type of Support
-
-        
-        
-        if (usr == 'L1'){
-            this.timeEntry.push('Jr. Technician Rate');     //[3] Charge Out Position
-            this.timeEntry.push('140');                     //[4] Charge Out Rage
-        }else{ 
-            this.timeEntry.push('Sr. Technician Rate');     //[3] Charge Out Position
-            this.timeEntry.push('160');                     //[4] Charge Out Rate
-        }
-            
-        //TODO fix the picklist values for this so it works because the TR and Case equvilant values arent teh same string
-            this.timeEntry.push('Eastbay Cloud Services Ltd.');   //[5] Billing Company
-
-            
-        if(this.chosenRows){
-
-            this.timeEntry.push(this.chosenRows[0].Name);              //[6] Description of work
-            this.chosenRows[0].WBS__c ? this.timeEntry.push(this.chosenRows[0].WBS__c.toString()) : this.timeEntry.push('0');            //[7] WBS if blank put 0
-            this.timeEntry.push(this.selectedRowsID) //[8] CLI Id
-        }   
-
-        try {
-            const result = await timeEntryModal.open({
-                label: 'Time Entry',
-                size: 'large',
-                description: 'Time Entry',
-                component: 'c-check-list-time-entry',
-                checklistId: this.passedChklistId,
-                caseId: this.recordId,
-                selectedRowID: this.selectedRowsID,
-                timeEntry: this.timeEntry,
-            });
-            if (result === 'saved') {
-                console.log('saved');
-                
-            }
-        } catch {
-            console.log('Error opening modal:');
-        }
         this.timeEntry = [];
-        this.refreshData();
-        console.log(result);
-    }
+      
+        try {
+          const [usr, cse, tos] = await Promise.all([
+            getUser({ userId: this.userId }),
+            getCase({ caseId: this.recordId }),
+            getTOS({ caseId: this.recordId }),
+          ]);
+      
+          this.timeEntry.push(this.recordId); // [0] Case
+          this.timeEntry.push(this.userId); // [1] User
+          this.timeEntry.push(tos); // [2] Type of Support
+      
+          if (usr === 'L1') {
+            this.timeEntry.push('Jr. Technician Rate'); // [3] Charge Out Position
+            this.timeEntry.push('140'); // [4] Charge Out Rate
+          } else {
+            this.timeEntry.push('Sr. Technician Rate'); // [3] Charge Out Position
+            this.timeEntry.push('160'); // [4] Charge Out Rate
+          }
+      
+          this.timeEntry.push('Eastbay Cloud Services Ltd.'); // [5] Billing Company
+      
+          if (this.chosenRows) {
+            this.timeEntry.push(this.chosenRows[0].Name); // [6] Description of work
+            this.timeEntry.push(this.chosenRows[0].WBS__c ? this.chosenRows[0].WBS__c.toString() : '0'); // [7] WBS if blank put 0
+            this.timeEntry.push(this.selectedRowsID); // [8] CLI Id
+          }
+      
+          await timeEntryModal.open({
+            label: 'Time Entry',
+            size: 'large',
+            description: 'Time Entry',
+            component: 'c-check-list-time-entry',
+            checklistId: this.passedChklistId,
+            caseId: this.recordId,
+            selectedRowID: this.selectedRowsID,
+            timeEntry: this.timeEntry,
+          });
+        } catch (error) {
+          console.error('Error in handleTimeOpen:', error);
+        } finally {
+            console.log('finally');
+          this.timeEntry = [];
+          await refreshApex(this.wiredCheckListResult);
+        }
+      }
 
     //open the dataloader modal
     async handleNewChecklist() {
@@ -424,10 +409,9 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
     async handleTimeClose() {
         console.log('time close');
         this.refreshData();
+        await refreshApex(this.recordId);
         this.toTimeEntry = false;
-        console.log(this.timeEntry);
         this.timeEntry = [];
-        console.log(this.timeEntry);
     }
 
     async handleChecklistClose() {

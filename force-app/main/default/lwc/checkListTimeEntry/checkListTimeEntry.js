@@ -69,7 +69,6 @@ export default class CheckListTimeEntry extends LightningModal {
 
     handleHW(event){
         this.hoursWorked = event.detail.value;
-        console.log(this.hoursWorked);
     }
 
     handleOT(event){
@@ -91,7 +90,6 @@ export default class CheckListTimeEntry extends LightningModal {
     async handleTRSuccess(event){
         this.timeID = event.detail.id;
 
-        console.log(event.detail);
 
         // Wait for a moment to ensure the record is fully created
         await new Promise(resolve => setTimeout(resolve, 1000));
