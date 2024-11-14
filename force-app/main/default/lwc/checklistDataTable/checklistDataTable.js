@@ -357,6 +357,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
 
             this.timeEntry.push(this.chosenRows[0].Name);              //[6] Description of work
             this.chosenRows[0].WBS__c ? this.timeEntry.push(this.chosenRows[0].WBS__c.toString()) : this.timeEntry.push('0');            //[7] WBS if blank put 0
+            this.timeEntry.push(this.selectedRowsID) //[8] CLI Id
         }   
 
         try {
@@ -371,12 +372,15 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
                 timeEntry: this.timeEntry,
             });
             if (result === 'saved') {
-                this.refreshData();
+                console.log('saved');
+                
             }
         } catch {
             console.log('Error opening modal:');
         }
         this.timeEntry = [];
+        this.refreshData();
+        console.log(result);
     }
 
     //open the dataloader modal
@@ -416,7 +420,9 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
         await refreshApex(this.records);
         this.isModalOpen = false;
     }
+
     async handleTimeClose() {
+        console.log('time close');
         this.refreshData();
         this.toTimeEntry = false;
         console.log(this.timeEntry);
@@ -434,16 +440,19 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
     async handleModalSave() {
 
         this.isModalOpen = false;
+        this.refreshData();
     }
 
     async handleTimeSave() {
 
         this.toTimeEntry = false;
+        this.refreshData();
     }
 
     async handleNewSave() {
 
         this.toNewList = false;
+        this.refreshData();
     }
 
     handleSorting(event) {

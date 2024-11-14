@@ -1,4 +1,5 @@
 import { api, track, wire } from 'lwc'; // Importing necessary modules from LWC
+import { createRecord } from 'lightning/uiRecordApi';
 import insertLine from '@salesforce/apex/lwcCSVUploaderController.insertNewElement'; // Importing Apex method
 import { ShowToastEvent } from 'lightning/platformShowToastEvent'; // Importing Toast event to show notifications
 import LightningModal from 'lightning/modal'; // Importing Lightning Modal for creating modal dialogs
@@ -9,16 +10,13 @@ import updateCLI from '@salesforce/apex/checklistTimeEntryController.updateCheck
 //import TIME_REPORT from '@salesforce/schema/SFDC_Time_Reporting__c'
 export default class CheckListTimeEntry extends LightningModal {
 
-    //TODO: linking Checklist items into orginal Time Reporting methods
-    //TODO: if not a project WBS must be blank
-
-
     @api caseId;         // Expose case record ID to the component to receive data from the parent component
     @api checklistId;    // Expose checklist record ID to the component to receive data from the parent component
     @api selectedRowID ; //
-    @api timeEntry;
+    @api timeEntry; 
     theCase = '';
     theUser = '';
+    theCLI = '';
     Tos = '';
     wbsNum = '';
     hoursWorked = 0.00;
@@ -39,6 +37,7 @@ export default class CheckListTimeEntry extends LightningModal {
             if(result){
                 this.theCase = this.timeEntry[0];
                 this.theUser = this.timeEntry[1];
+                this.theCLI = this.timeEntry[8].toString();
                 this.Tos = this.timeEntry[2];
                 this.chargeOutPos = this.timeEntry[3];
                 this.chargeOutRate = this.timeEntry[4];
@@ -46,6 +45,7 @@ export default class CheckListTimeEntry extends LightningModal {
                 this.descOfWork  = this.timeEntry[6];
                 this.wbsNum = this.timeEntry[7];
                 //this.hoursWorked = this.timeEntry[8];   Removed because time entry hours works is unique, kept like to show in index of hours worked             
+
             }
         }catch (error){
             console.log("ERROR: "+ error);
@@ -79,11 +79,9 @@ export default class CheckListTimeEntry extends LightningModal {
     
     async handleSubmit() {
         const rowId = this.selectedRowID.toString(); // set the rowId for the Checklist item being updated to a string
-        const totalTime = parseFloat(this.hoursWorked) + parseFloat(this.otHours); // add the two values of OT hours and regular hours as a decimal
+        const totalTime = parseFloat(this.hoursWorked) + parseFloat(this.otHours); // add the two values of OT hours and regular hours as a decimal        
 
-        console.log(totalTime);
-
-        await updateCLI({cliId: rowId, totalHours: totalTime,});
+       // await updateCLI({cliId: rowId, totalHours: totalTime,});
         this.timeEntry = [];
         await new Promise(resolve => setTimeout(resolve, 1500));
         this.handleClose();       
@@ -92,6 +90,8 @@ export default class CheckListTimeEntry extends LightningModal {
 
     async handleTRSuccess(event){
         this.timeID = event.detail.id;
+
+        console.log(event.detail);
 
         // Wait for a moment to ensure the record is fully created
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -104,8 +104,6 @@ export default class CheckListTimeEntry extends LightningModal {
             
         } else {
             console.error('Signature component not found');
-        }
-        
+        }      
     }
-
 }

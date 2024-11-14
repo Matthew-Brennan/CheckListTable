@@ -17,6 +17,7 @@ public with sharing class checklistTimeEntryController {
 
     }
 
+
     @AuraEnabled
     public static string updateCheckListEntry (String cliId, Decimal totalHours) {
 

@@ -10,13 +10,11 @@
         <lightning-record-edit-form object-api-name="SFDC_Time_Reporting__c" onsuccess={handleTRSuccess}>
             <lightning-messages> </lightning-messages>
         <!-- Time Reporting Input Fields -->
-            <lightning-input-field
-            field-name="Case__c"
-            value={theCase}
-            ></lightning-input-field>
+            <lightning-input-field field-name="Case__c" value={theCase}></lightning-input-field>
+            <lightning-input-field field-name="Checklist_Item__c" value={theCLI}></lightning-input-field>
 
             <!-- User Related List Selector -->
-            <lightning-input-field  field-name="User__c" value={theUser}></lightning-input-field>
+            <lightning-input-field field-name="User__c" value={theUser}></lightning-input-field>
             <lightning-input-field field-name="Date__c"> </lightning-input-field>
             <lightning-input-field field-name="Time_Category__c"> </lightning-input-field>
             <lightning-input-field field-name="Description_of_Work__c" value={descOfWork}> </lightning-input-field>
