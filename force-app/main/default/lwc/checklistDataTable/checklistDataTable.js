@@ -65,7 +65,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
     @track totalPages = 0;
     pageSize = PAGE_SIZE;
     
-
+    //get the checklist items from the checklist
     @wire(hasChecklist, { recordId: '$recordId' })
     wiredCase(result){
         if(result.data){
@@ -121,14 +121,23 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
         }
     }
 
+    //dont show previous page if on the first page
     get disablePrevious() {
         return this.pageNumber <= 1;
     }
 
+    //dont show next page if on the last page
     get disableNext() {
         return this.pageNumber >= this.totalPages;
     }
 
+    /*handle data changes on the selected row(s)
+    * event: Event           usual update or delete
+    *
+    * actions deterim what is being changed either delete or update in our use case
+    * row gets the details for the rows
+    * 
+    */
     handleRowAction(event) {
         const action = event.detail.action;
         const row = event.detail.row;
