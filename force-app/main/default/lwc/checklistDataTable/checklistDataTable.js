@@ -50,6 +50,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
     timeEntry = [];
     TimeEntryBool =  false;
     checkListBool = false;
+    timeId;
 
     @track isModalOpen = false; // Track modal state
     @track toTimeEntry = false; // track time entry modal state
@@ -84,7 +85,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
         if (result.data) {
             this.checkList = result.data.map(item => ({
                 ...item,
-                Assigned_To__c: item.Assigned_To__c ? {
+                Assigned_To__c: item.Assigned_To__c ? { // not used anymore but too much of a pain to remove
                     Id: item.Assigned_To__c,
                     Name: item.Assigned_To__r ? item.Assigned_To__r.Name : '',
                     SmallPhotoUrl: item.Assigned_To__r ? item.Assigned_To__r.SmallPhotoUrl : ''
@@ -151,6 +152,11 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
         });
     }
 
+    /*Function for showing toast messages
+    * title: String       the title of the toast alert
+    * message: String     the message with details for the user explaining the result
+    * variant: String     usualy either success or error so the correct colour of toast is displayed to indicate success or failure
+    */
     showToast(title, message, variant) {
         const event = new ShowToastEvent({
             title: title,
@@ -169,7 +175,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',
-                        message: 'Checklist items updated',
+                        message: 'Checklist items created',
                         variant: 'success'
                     })
                 );            
@@ -267,6 +273,7 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
 
     }
 
+    //Handle the deletion of the selected rows of Checklist Items
     async handleClickDelete() {
         const result = confirm('Are you sure you want to delete the selected tasks?');
         if (result) {
@@ -311,7 +318,11 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
                 recordId: this.passedChklistId,
             });
         if (result === 'saved') {
-            this.refreshData();
+            this.showToast(
+                'Success',
+                'CSV Data Loaded',
+                'success'
+            );
         }
         } catch {
             console.log('Error opening modal:', error);
@@ -345,11 +356,12 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
       
           if (this.chosenRows) {
             this.timeEntry.push(this.chosenRows[0].Name); // [6] Description of work
-            this.timeEntry.push(this.chosenRows[0].WBS__c ? this.chosenRows[0].WBS__c.toString() : '0'); // [7] WBS if blank put 0
+            this.timeEntry.push(this.chosenRows[0].WBS__c ? this.chosenRows[0].WBS__c.toString() : ''); // [7] WBS if blank put empty value
             this.timeEntry.push(this.selectedRowsID); // [8] CLI Id
           }
       
-          await timeEntryModal.open({
+          // Open the Time Report Modal
+          const result = await timeEntryModal.open({
             label: 'Time Entry',
             size: 'large',
             description: 'Time Entry',
@@ -359,10 +371,15 @@ export default class ChecklistDataTable extends NavigationMixin(LightningElement
             selectedRowID: this.selectedRowsID,
             timeEntry: this.timeEntry,
           });
+          this.timeId = result ? result : 'error'; //set the timeId from the modal to use in the success message
         } catch (error) {
           console.error('Error in handleTimeOpen:', error);
         } finally {
-            console.log('finally');
+            this.showToast(
+                'Success',
+                'Time Report '+ this.timeId +' created successfully ',
+                'success'
+            );
           this.timeEntry = [];
           await refreshApex(this.wiredCheckListResult);
         }

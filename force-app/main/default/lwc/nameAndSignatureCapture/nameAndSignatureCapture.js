@@ -28,9 +28,7 @@ export default class NameAndSignatureCapture extends LightningElement {
                     // Call the Apex method and await its completion
                     const value = await insertSignature({ parentId: this.recordId, base64Data: dataURL });
                     this.imgSrc = dataURL;
-                    console.log(this.recordId);
-                    console.log(dataURL);
-                    console.log(value);
+
                     // Show success toast message
                     this.dispatchEvent(
                         new ShowToastEvent({

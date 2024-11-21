@@ -61,7 +61,7 @@ export default class CheckListTimeEntry extends LightningModal {
 
     // Closes the modal window
     handleClose() {
-        this.close(); // Close the modal
+        this.close(this.timeID); // Close the modal
         console.log('closed');
         this.timeEntry = [];
         return 'saved'; // Return 'saved' as a confirmation
@@ -83,14 +83,11 @@ export default class CheckListTimeEntry extends LightningModal {
        // await updateCLI({cliId: rowId, totalHours: totalTime,});
         this.timeEntry = [];
         await new Promise(resolve => setTimeout(resolve, 1500));
-        this.handleClose();       
-
     }
 
     async handleTRSuccess(event){
         this.timeID = event.detail.id;
-
-
+        console.log('TR Success');
         // Wait for a moment to ensure the record is fully created
         await new Promise(resolve => setTimeout(resolve, 1000));
         // Query the child component (assuming it's present in the template)
@@ -102,6 +99,8 @@ export default class CheckListTimeEntry extends LightningModal {
             
         } else {
             console.error('Signature component not found');
-        }      
+        }   
+        this.handleClose();   
+        
     }
 }
